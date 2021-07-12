@@ -5,6 +5,9 @@
     "default_title": "Click for options",
     "default_popup": "options.html"
   },
+  "icons": {
+    "128": "app_icon.png"
+  },
   "permissions": [
     "activeTab",
     "storage"
