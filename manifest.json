@@ -1,0 +1,33 @@
+{
+  "name": "SimpleGestures",
+  "manifest_version": 3,
+  "action": {
+    "default_title": "Click for options",
+    "default_popup": "options.html"
+  },
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "simple_gestures.js"
+      ],
+      "all_frames": true,
+      "run_at": "document_start"
+    }
+  ],
+  "version": "0.1",
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": false
+  },
+  "description": "A very simple mouse gestures extension"
+}

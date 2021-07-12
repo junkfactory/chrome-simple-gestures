@@ -1,0 +1,105 @@
+<!-- 
+/*   
+ *  Copyright (C) 2013  AJ Ribeiro
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+*/ 
+-->
+
+<html>
+
+<head>
+    <title>SimpleGestures Options</title>
+    <style>
+        body {
+            width: 400px;
+            height: 460px;
+            background-color: #29292e;
+            color: white;
+            border: 1px solid #000;
+            margin: 0px;
+            padding: 10px;
+        }
+        table {
+            border: none;
+            width: 100%;
+        }
+        table th {
+            text-align: left;
+        }
+        .note {
+            color: yellow;
+        }
+        #status {
+            color: greenyellow;
+        }
+    </style>
+</head>
+
+<h1>SimpleGestures Configuration</h1>
+<p>Use mouse right button to hold and drag to activate a gesture.</p>
+<p class="note">Note: Valid gesture values are U (up), D (down), L (left), R (right)</p>
+
+<body>
+    <form id="option_form">
+        <table id="optsTab">
+            <tr>
+                <td><label for="trail">Show Gesture Trails:</label></td>
+                <td>
+                    <input type='checkbox' id='trail'></input>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Gesture Color:</td>
+                <td>
+                    <select id="color">
+                        <option value="red" selected>red</option>
+                        <option value="green">green</option>
+                        <option value="blue">blue</option>
+                        <option value="yellow">yellow</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Gesture Width:</td>
+                <td>
+                    <select id="width">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3" selected>3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">&nbsp;</td>
+            </tr>
+            <tr>
+                <th colspan=2 align='center'>Gestures</td>
+            </tr>
+            <tr>
+                <th>Action</th>
+                <th>Gesture</th>
+            </tr>
+        </table>
+        <p class="note">If "Open New Tab" is assigned, right click + drag on a link will open that link.</p>
+        <p id="status">&nbsp;</p>
+        <input type="submit">
+    </form>
+</body>
+<script src="options.js"></script>
+
+</html>
