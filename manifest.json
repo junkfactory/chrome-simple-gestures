@@ -1,8 +1,10 @@
 {
-  "name": "SimpleGestures",
   "manifest_version": 3,
+  "name": "SimpleGestures",
+  "version": "0.2",
+  "description": "A very simple mouse gestures extension",
   "action": {
-    "default_title": "Click for options",
+    "default_title": "Click for SimpleGestures options",
     "default_popup": "options.html"
   },
   "icons": {
@@ -27,10 +29,8 @@
       "run_at": "document_start"
     }
   ],
-  "version": "0.1",
   "options_ui": {
     "page": "options.html",
     "open_in_tab": false
-  },
-  "description": "A very simple mouse gestures extension"
+  }
 }

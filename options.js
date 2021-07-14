@@ -34,7 +34,7 @@ defaultGestures = { "R": "forward", "L": "back", "D": "closetab" }
 commandMapping = {
     "History Back": "back",
     "History Forward": "forward",
-    "Reload": "reload",
+    "Reload (bypass cache)": "reload",
     "Open New Tab": "newtab",
     "Close Current Tab": "closetab",
 }
