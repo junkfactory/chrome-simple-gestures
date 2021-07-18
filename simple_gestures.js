@@ -71,65 +71,83 @@ function draw(x, y) {
     ly = y
 }
 
+function onStart(event) {
+    if (!loaded) {
+        watchGestures()
+        loaded = true
+    }
+    my = event.pageX;
+    mx = event.pageY;
+    lx = my
+    ly = mx
+    currentGesture = ""
+    previousGesture = ""
+    moved = false
+    if (event.target.href) {
+        link = event.target.href
+    }
+    else if (event.target.parentElement.href) {
+        link = event.target.parentElement.href
+    }
+    else {
+        link = null
+    }
+}
+
+function onMove(event) {
+    ny = event.pageX;
+    nx = event.pageY;
+    var r = Math.sqrt(Math.pow(nx - mx, 2) + Math.pow(ny - my, 2))
+    if (r > 16) {
+        phi = Math.atan2(ny - my, nx - mx)
+        if (phi < 0) phi += 2. * pi
+        if (phi >= pi / 4. && phi < 3. * pi / 4.)
+            var tmove = "R"
+        else if (phi >= 3. * pi / 4. && phi < 5. * pi / 4.)
+            var tmove = "U"
+        else if (phi >= 5. * pi / 4. && phi < 7. * pi / 4.)
+            var tmove = "L"
+        else if (phi >= 7. * pi / 4. || phi < pi / 4.)
+            var tmove = "D"
+        if (tmove != previousGesture) {
+            currentGesture += tmove
+            previousGesture = tmove
+        }
+
+        if (trail) {
+            if (moved == false) {
+                createCanvas();
+            }
+            draw(ny, nx);
+        }
+        moved = true
+        mx = nx
+        my = ny
+    }
+}
+
+function executeGesture() {
+    var action = gestureActionMap[currentGesture];
+    if (action) {
+        chrome.runtime.sendMessage({ msg: action, url: link }, result => {
+            if (result != null) {
+                //console.log("result", result);
+            }
+        });
+    }
+}
+
 document.onmousedown = function (event) {
     rmousedown = event.button == 2;
     if (rmousedown && suppress) {
-        if (!loaded) {
-            loadOptions()
-            loaded = true
-        }
-        my = event.pageX;
-        mx = event.pageY;
-        lx = my
-        ly = mx
-        currentGesture = ""
-        previousGesture = ""
-        moved = false
-        if (event.target.href) {
-            link = event.target.href
-        }
-        else if (event.target.parentElement.href) {
-            link = event.target.parentElement.href
-        }
-        else {
-            link = null
-        }
+        onStart(event);
     }
-
 };
 
 document.onmousemove = function (event) {
     //track the mouse if we are holding the right button
     if (rmousedown) {
-        ny = event.pageX;
-        nx = event.pageY;
-        var r = Math.sqrt(Math.pow(nx - mx, 2) + Math.pow(ny - my, 2))
-        if (r > 16) {
-            phi = Math.atan2(ny - my, nx - mx)
-            if (phi < 0) phi += 2. * pi
-            if (phi >= pi / 4. && phi < 3. * pi / 4.)
-                var tmove = "R"
-            else if (phi >= 3. * pi / 4. && phi < 5. * pi / 4.)
-                var tmove = "U"
-            else if (phi >= 5. * pi / 4. && phi < 7. * pi / 4.)
-                var tmove = "L"
-            else if (phi >= 7. * pi / 4. || phi < pi / 4.)
-                var tmove = "D"
-            if (tmove != previousGesture) {
-                currentGesture += tmove
-                previousGesture = tmove
-            }
-
-            if (trail) {
-                if (moved == false) {
-                    createCanvas();
-                }
-                draw(ny, nx);
-            }
-            moved = true
-            mx = nx
-            my = ny
-        }
+        onMove(event);
     }
 };
 
@@ -149,17 +167,6 @@ document.onmouseup = function (event) {
     destroyCanvas();
 };
 
-function executeGesture() {
-    var action = gestureActionMap[currentGesture];
-    if (action) {
-        chrome.runtime.sendMessage({ msg: action, url: link }, result => {
-            if (result != null) {
-                //console.log("result", result);
-            }
-        });
-    }
-}
-
 document.oncontextmenu = function () {
     if (suppress)
         return false
@@ -170,7 +177,7 @@ document.oncontextmenu = function () {
     }
 };
 
-function loadOptions(name) {
+function watchGestures(name) {
     chrome.runtime.sendMessage({ msg: "config.trailColor" }, function (response) {
         if (response) {
             myColor = response.resp
@@ -195,4 +202,4 @@ function loadOptions(name) {
     });
 }
 
-document.addEventListener('DOMContentLoaded', loadOptions);
+document.addEventListener('DOMContentLoaded', watchGestures);
