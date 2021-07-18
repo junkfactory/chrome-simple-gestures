@@ -103,6 +103,9 @@ function saveConfiguration(e) {
             // Update status to let user know options were saved.
             var status = document.getElementById("status");
             status.innerHTML = result.resp;
+            setTimeout(() => {
+                status.innerHTML = ''
+            }, 5000);
         });
     });
     return false;
@@ -143,6 +146,18 @@ function restoreOptions() {
 
         createOptions(config);
     });
+
+    var tabNav = document.getElementsByName('tabs')
+    tabNav.forEach(t => {
+        t.addEventListener('click', e => {
+            for (const c of document.getElementsByClassName('tab')) {
+                c.style.display = 'none'
+            }
+            for (const s of document.getElementsByClassName(e.target.id)) {
+                s.style.display = 'block'
+            }
+        })
+    })
 }
 
 document.addEventListener('DOMContentLoaded', function() {

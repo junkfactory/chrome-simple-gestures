@@ -1,32 +1,77 @@
 body {
-    width: 370px;
+    width           : 370px;
     background-color: #29292e;
-    color: white;
-    border: 1px solid #000;
-    margin: 0px;
-    padding: 10px;
+    color           : white;
+    border          : 1px solid #000;
+    margin          : 0px;
+    padding         : 10px;
 }
+
 table {
     border: none;
-    width: 100%;
+    width : 100%;
 }
+
 table th {
     text-align: left;
 }
+
 table td {
     font-size: small;
 }
+
 .note {
     color: yellow;
 }
+
 #status {
-    color: greenyellow;
+    color: rgb(199, 83, 83);
+    display: inline;
+    margin-left: 10px;
+    font-weight: bold;
 }
+
 .logo {
-    float: left;
-    width: 28px;
+    float : left;
+    width : 28px;
     height: 28px;
 }
+
 input {
     border-style: hidden;
+}
+
+/*
+tab navigation
+*/
+input[name="tabs"],
+input[name="tabs"]~.tab {
+    display   : none;
+    border-top: 1px solid #999;
+    padding   : 12px;
+}
+
+input[name="tabs"]+label {
+    display      : inline-block;
+    border       : 1px solid #999;
+    padding      : 4px 12px;
+    border-radius: 4px 4px 0 0;
+    position     : relative;
+    top          : 1px;
+    cursor       : pointer;
+}
+
+input[name="tabs"]:checked+label {
+    background   : #999;
+    color        : #000;
+    border-bottom: 1px solid transparent;
+}
+
+input[name="tabs"]~.generalConfig {
+    display: block;
+}
+
+input[type="submit"] {
+    padding: 4px 12px;
+    border-radius: 4px 4px;
 }

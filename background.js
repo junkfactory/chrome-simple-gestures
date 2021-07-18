@@ -102,7 +102,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             chrome.tabs.query({}, tabs => {
                 tabs.forEach(t => chrome.tabs.sendMessage(t.id, { msg: "tabs.config.update", updatedConfig: config }))
             });
-            sendResponse({ resp: "Configuration saved"})
+            sendResponse({ resp: "Configuration saved!"})
             break;
         case "config":
             sendResponse({ resp: config });
