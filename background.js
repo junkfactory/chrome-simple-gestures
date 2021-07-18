@@ -17,6 +17,7 @@
 
 //default configuration
 const config = {
+    rockerEnabled: true,
     trailEnabled: true,
     trailColor: "ff3300",
     trailWidth: 2,
@@ -50,6 +51,25 @@ function withActiveTab(callback) {
     });
 }
 
+function switchTab(tabs, direction) {
+    var indices = []
+    var activeIndex = -1;
+    for (var i = 0; i < tabs.length; i++) {
+        var t = tabs[i]
+        indices.push(t)
+        if (t.active) {
+            activeIndex = i;
+        }
+    }
+    var nexttab = activeIndex + direction;
+    if (nexttab < 0) {
+        nexttab = indices.length - 1
+    } else if (nexttab > indices.length - 1) {
+        nexttab = 0;
+    }
+    chrome.tabs.highlight({tabs: indices[nexttab].index, windowId: indices[nexttab].windowId})
+}
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     switch (request.msg) {
         case "back":
@@ -81,17 +101,18 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             Object.assign(config, request.updatedCconfig);
             sendResponse({ resp: "Configuration Saved" });
             break;
-        case "config.trailColor":
-            sendResponse({ resp: config.trailColor });
+        case "config":
+            sendResponse({resp: config});
             break;
-        case "config.trailWidth":
-            sendResponse({ resp: config.trailWidth });
+        case "nexttab":
+            chrome.tabs.query({}, r => {
+                switchTab(r, 1)
+            })
             break;
-        case "config.gestures":
-            sendResponse({ resp: config.gestures });
-            break;
-        case "config.trailEnabled":
-            sendResponse({ resp: config.trailEnabled });
+        case "prevtab":
+            chrome.tabs.query({}, r => {
+                switchTab(r, -1)
+            })
             break;
         default:
             console.error("Unknown message request", request);

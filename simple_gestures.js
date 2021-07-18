@@ -16,7 +16,7 @@
 */
 
 var rmousedown = false, moved = false;
-var trail = false
+var trail = false, rockerEnabled = true
 var mx, my, nx, ny, lx, ly, phi
 var currentGesture = "", previousGesture = ""
 var pi = 3.14159
@@ -54,21 +54,24 @@ function destroyCanvas() {
         try {
             document.body.removeChild(canvas);
         } catch (error) {
-            
+
         }
     }
 }
 
 function draw(x, y) {
-    var ctx = document.getElementById('canvas').getContext('2d');
-    ctx.beginPath();
-    ctx.strokeStyle = '#' + myColor
-    ctx.lineWidth = myWidth
-    ctx.moveTo(lx, ly);
-    ctx.lineTo(x, y);
-    ctx.stroke()
-    lx = x
-    ly = y
+    var canvas = document.getElementById('canvas');
+    if (canvas) {
+        var ctx = canvas.getContext('2d');
+        ctx.beginPath();
+        ctx.strokeStyle = '#' + myColor
+        ctx.lineWidth = myWidth
+        ctx.moveTo(lx, ly);
+        ctx.lineTo(x, y);
+        ctx.stroke()
+        lx = x
+        ly = y
+    }
 }
 
 function onStart(event) {
@@ -128,6 +131,8 @@ function onMove(event) {
 
 function executeGesture() {
     var action = gestureActionMap[currentGesture];
+    console.log('action', action)
+    return false
     if (action) {
         chrome.runtime.sendMessage({ msg: action, url: link }, result => {
             if (result != null) {
@@ -152,8 +157,14 @@ document.onmousemove = function (event) {
 };
 
 document.onmouseup = function (event) {
-    //right mouse release
-    if (event.button == 2) {
+    if (rockerEnabled && event.buttons > 0) {
+        if (event.button == 2) {
+            chrome.runtime.sendMessage({msg: "nexttab"})
+        } else if (event.button == 0) {
+            chrome.runtime.sendMessage({msg: "prevtab"})
+            ++suppress
+        }
+    } else if (event.button == 2) {
         // console.log('suppress is '+suppress)
         if (moved) {
             executeGesture();
@@ -178,28 +189,18 @@ document.oncontextmenu = function () {
 };
 
 function watchGestures(name) {
-    chrome.runtime.sendMessage({ msg: "config.trailColor" }, function (response) {
+    chrome.runtime.sendMessage({msg: "config" }, response => {
         if (response) {
-            myColor = response.resp
+            var config = response.resp
+            trail = Boolean(config.trailEnabled)
+            rockerEnabled = Boolean(config.rockerEnabled)
+            myColor = config.trailColor
+            myWidth = config.trailWidth
+            myGests = config.gestures
+            gestureActionMap = invertHash(myGests)
         }
-    });
-    chrome.runtime.sendMessage({ msg: "config.trailWidth" }, function (response) {
-        if (response) {
-            myWidth = response.resp
-        }
-    });
-    chrome.runtime.sendMessage({ msg: "config.gestures" }, function (response) {
-        if (response) {
-            myGests = response.resp
-        }
-        gestureActionMap = invertHash(myGests)
-    });
+    })
 
-    chrome.runtime.sendMessage({ msg: "config.trailEnabled" }, function (response) {
-        if (response) {
-            trail = Boolean(response.resp)
-        }
-    });
 }
 
 document.addEventListener('DOMContentLoaded', watchGestures);
