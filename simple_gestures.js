@@ -188,16 +188,27 @@ document.oncontextmenu = function () {
     }
 };
 
+function updateConfig(config) {
+    trail = Boolean(config.trailEnabled)
+    rockerEnabled = Boolean(config.rockerEnabled)
+    myColor = config.trailColor
+    myWidth = config.trailWidth
+    myGests = config.gestures
+    gestureActionMap = invertHash(myGests)
+}
+
 function watchGestures(name) {
     chrome.runtime.sendMessage({msg: "config" }, response => {
         if (response) {
-            var config = response.resp
-            trail = Boolean(config.trailEnabled)
-            rockerEnabled = Boolean(config.rockerEnabled)
-            myColor = config.trailColor
-            myWidth = config.trailWidth
-            myGests = config.gestures
-            gestureActionMap = invertHash(myGests)
+            updateConfig(response.resp)
+        }
+    })
+
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+        switch(request.msg) {
+            case "tabs.config.update":
+                updateConfig(request.updatedConfig)
+                break;
         }
     })
 

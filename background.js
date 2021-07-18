@@ -67,7 +67,7 @@ function switchTab(tabs, direction) {
     } else if (nexttab > indices.length - 1) {
         nexttab = 0;
     }
-    chrome.tabs.highlight({tabs: indices[nexttab].index, windowId: indices[nexttab].windowId})
+    chrome.tabs.highlight({ tabs: indices[nexttab].index, windowId: indices[nexttab].windowId })
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -99,10 +99,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             break;
         case "config.update":
             Object.assign(config, request.updatedCconfig);
-            sendResponse({ resp: "Configuration Saved" });
+            chrome.tabs.query({}, tabs => {
+                tabs.forEach(t => chrome.tabs.sendMessage(t.id, { msg: "tabs.config.update", updatedConfig: config }))
+            });
+            sendResponse({ resp: "Configuration saved"})
             break;
         case "config":
-            sendResponse({resp: config});
+            sendResponse({ resp: config });
             break;
         case "nexttab":
             chrome.tabs.query({}, r => {
