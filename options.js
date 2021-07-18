@@ -88,6 +88,8 @@ function saveConfiguration(e) {
     var trail = document.getElementById('trail');
     config.trailEnabled = trail.checked;
 
+    config.rockerEnabled = document.getElementById('rockerEnabled').checked;
+
     inputs = document.getElementsByTagName('input')
     for (i = 0; i < inputs.length; i++) {
         s = inputs[i].parentElement.parentElement.children[0].textContent
@@ -113,6 +115,9 @@ function restoreOptions() {
 
         var trailEnabled = document.getElementById('trail');
         trailEnabled.checked = config.trailEnabled;
+
+        var rockerEnabled = document.getElementById('rockerEnabled');
+        rockerEnabled.checked = config.rockerEnabled;
 
         var select = document.getElementById("color");
         value = colorCodeToName[config.trailColor];
