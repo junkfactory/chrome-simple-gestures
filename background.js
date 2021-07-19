@@ -30,11 +30,6 @@ const config = {
     }
 };
 
-chrome.action.onClicked.addListener((tab) => {
-    chrome.runtime.openOptionsPage();
-});
-
-
 chrome.runtime.onInstalled.addListener(() => {
     chrome.storage.local.get("simple_gestures_config", result => {
         if (result.simple_gestures_config) {

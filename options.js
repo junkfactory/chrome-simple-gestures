@@ -74,12 +74,52 @@ function createOptions(config) {
         tr.appendChild(td)
         td.appendChild(inp)
     }
+
+    //build custom urls config
+    for (const g in config.gestures) {
+        if (Object.hasOwnProperty.call(config.gestures, g)) {
+            const url = config.gestures[g];
+            if (url.startsWith('http')) {
+                addCustomUrl(url, g)
+            }
+        }
+    }
+    
 }
 
+//validate configurations
+function validateConfiguration(optionForm) {
+    var status = $('#status')
+    status.innerHTML == ''
+    for (const i of optionForm.querySelectorAll('input[type=text]')) {
+        i.style.borderColor = '#fff'
+        switch(i.name) {
+            case 'url':
+                try {
+                    new URL(i.value)
+                } catch (error) {
+                    i.style.borderColor = 'red'
+                    status.innerHTML = 'Invalid url!'
+                }
+                break;
+            case 'gurl':
+                console.log('gurl', i.value)
+                if (i.value.trim() == '' || !/^[DULR]*$/.test(i.value)) {
+                    i.style.borderColor = 'red'
+                    status.innerHTML = 'Invalid gesture pattern!'
+                }
+                break;
+        }
+    }
+    return status.innerHTML == ''
+}
 
 // Saves options to local storage.
 function saveConfiguration(e) {
     e.preventDefault();
+    if (!validateConfiguration(e.target)) {
+        return false;
+    }
     var select, value
     var config = {
         gestures: {}
@@ -97,13 +137,21 @@ function saveConfiguration(e) {
 
     config.rockerEnabled = $('#rockerEnabled').checked;
 
-    inputs = $('input')
-    for (i = 0; i < inputs.length; i++) {
-        s = inputs[i].parentElement.parentElement.children[0].textContent
-        if (inputs[i].value.length > 0)
-            config.gestures[commandMapping[s]] = inputs[i].value;
-        else
-            delete config.gestures[commandMapping[s]];
+    var url = null;
+    for (const i of $('#option_form input')) {
+        if (url == null && i.name == 'url') {
+            url = i.value;
+        } else if (url != null && i.name == 'gurl') {
+            config.gestures[i.value] = url
+            url = null
+        } else {
+            var s = i.parentElement.parentElement.children[0].textContent
+            if (i.value.length > 0) {
+                config.gestures[commandMapping[s]] = i.value;
+            } else {
+                delete config.gestures[commandMapping[s]];
+            }
+        }
     }
     chrome.storage.local.set({ simple_gestures_config: config }, function () {
         chrome.runtime.sendMessage({ msg: "config.update", updatedCconfig: config }, result => {
@@ -122,7 +170,7 @@ function saveConfiguration(e) {
 function restoreOptions() {
     chrome.storage.local.get("simple_gestures_config", (result) => {
         var config = result.simple_gestures_config;
-
+        console.log('options', config)
         var trailEnabled = $('#trail');
         trailEnabled.checked = config.trailEnabled;
 
@@ -165,9 +213,7 @@ function restoreOptions() {
     })
 }
 
-function addCustomUrl(e) {
-    e.preventDefault()
-    console.log("add custom url")
+function addCustomUrl(url, g) {
     var urlTable = $("#customUrlTab");
     var tr = urlTable.insertRow(urlTable.rows.length)
     //url
@@ -175,7 +221,8 @@ function addCustomUrl(e) {
     var inp = $().createElement('input')
     inp.type = 'text'
     inp.className = 'url'
-    inp.autofocus = true
+    inp.name = 'url'
+    inp.value = url
     td.appendChild(inp)
     tr.appendChild(td)
     //gesture
@@ -183,6 +230,8 @@ function addCustomUrl(e) {
     var gurl = $().createElement('input')
     gurl.type = 'text'
     gurl.className = 'gurl'
+    gurl.name = 'gurl'
+    gurl.value = g
     td.appendChild(gurl)
     tr.appendChild(td)
 
@@ -193,7 +242,7 @@ function addCustomUrl(e) {
     removeLink.href = '#'
     removeLink.innerHTML = '-'
     removeLink.addEventListener('click', e => {
-        console.log('remove', e.target.parentElement.parentElement)
+        $('#customUrlTab tbody').removeChild(e.target.parentElement.parentElement)
     });
     td.appendChild(removeLink)
     tr.appendChild(td)
@@ -204,5 +253,8 @@ function addCustomUrl(e) {
 $().addEventListener('DOMContentLoaded', function () {
     restoreOptions();
     $("#option_form").addEventListener("submit", saveConfiguration);
-    $('#plus').addEventListener('click', addCustomUrl)
+    $('#plus').addEventListener('click', e => {
+        e.preventDefault()
+        addCustomUrl()
+    })
 });
