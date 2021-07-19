@@ -188,7 +188,7 @@ function addCustomUrl(e) {
     removeLink.href = '#'
     removeLink.innerHTML = 'X'
     removeLink.addEventListener('click', e => {
-        console.log('remove', e)
+        console.log('remove', e.target.parentElement.parentElement)
     });
     td.appendChild(removeLink)
     tr.appendChild(td)
