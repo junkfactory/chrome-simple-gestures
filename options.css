@@ -12,11 +12,11 @@ table {
     width : 100%;
 }
 
-table th {
+th {
     text-align: left;
 }
 
-table td {
+td {
     font-size: small;
 }
 
@@ -25,8 +25,8 @@ table td {
 }
 
 #status {
-    color: rgb(199, 83, 83);
-    display: inline;
+    color      : rgb(199, 83, 83);
+    display    : inline;
     margin-left: 10px;
     font-weight: bold;
 }
@@ -41,6 +41,28 @@ input {
     border-style: hidden;
 }
 
+a.addremove {
+    font-weight : bold;
+    color       : #fff;
+    display: inline-block;
+    padding: 5px;
+    width: 10px;
+    text-align: center;
+    margin-right: 5px;
+    border: 1px solid #000;
+}
+
+a:link,
+a:hover,
+a:visited,
+a:active {
+    text-decoration: none;
+}
+
+a:hover.addremove {
+    background: #454550;
+}
+
 /*
 tab navigation
 */
@@ -48,7 +70,7 @@ input[name="tabs"],
 input[name="tabs"]~.tab {
     display   : none;
     border-top: 1px solid #999;
-    padding   : 12px;
+    padding   : 5px 0px;
 }
 
 input[name="tabs"]+label {
@@ -72,6 +94,6 @@ input[name="tabs"]~.generalConfig {
 }
 
 input[type="submit"] {
-    padding: 4px 12px;
+    padding      : 4px 12px;
     border-radius: 4px 4px;
 }

@@ -160,7 +160,44 @@ function restoreOptions() {
     })
 }
 
+function addCustomUrl(e) {
+    e.preventDefault()
+    console.log("add custom url")
+    var urlTable = document.getElementById("customUrlTab");
+    var tr = urlTable.insertRow(urlTable.rows.length)
+    //url
+    var td = document.createElement('td')
+    var inp = document.createElement('input')
+    inp.type = 'text'
+    inp.className = 'url'
+    inp.autofocus = true
+    td.appendChild(inp)
+    tr.appendChild(td)
+    //gesture
+    td = document.createElement('td')
+    var gurl = document.createElement('input')
+    gurl.type = 'text'
+    gurl.className = 'gurl'
+    td.appendChild(gurl)
+    tr.appendChild(td)
+ 
+    td = document.createElement('td')
+    var removeLink = document.createElement('a')
+    removeLink.className = 'addremove'
+    removeLink.title = 'Click to remove custom url mappin'
+    removeLink.href = '#'
+    removeLink.innerHTML = 'X'
+    removeLink.addEventListener('click', e => {
+        console.log('remove', e)
+    });
+    td.appendChild(removeLink)
+    tr.appendChild(td)
+    //focus on url input
+    inp.focus()
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     restoreOptions();
     document.getElementById("option_form").addEventListener("submit", saveConfiguration);
+    document.getElementById('plus').addEventListener('click', addCustomUrl)
 });

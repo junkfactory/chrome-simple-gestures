@@ -87,10 +87,18 @@
             <p class="note">If "Open New Tab" is assigned, right click + drag on a link will open that link.</p>
         </div>
         <div class="tab customUrls">
-            <p>Custom urls</p>
+            <table id="customUrlTab">
+                <tr>
+                    <td colspan="3" class="note"><a id="plus" href="#" title="Click to add new custom url" class="addremove">+</a>Assign gestures to open urls in a new tab</td>
+                </tr>
+                <tr>
+                    <th>Url (http/https)</th>
+                    <th colspan="2">Gesture</th>
+                </tr>
+            </table>
         </div>
         <div>
-            <input type="submit"> <div id="status">&nbsp;</div>
+            <input type="submit" value="Save configuration"> <div id="status">&nbsp;</div>
         </div>
     </form>
 </body>
