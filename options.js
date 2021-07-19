@@ -90,7 +90,7 @@ function createOptions(config) {
 //validate configurations
 function validateConfiguration(optionForm) {
     var status = $('#status')
-    status.innerHTML == ''
+    status.innerHTML = ''
     for (const i of optionForm.querySelectorAll('input[type=text]')) {
         i.style.borderColor = '#fff'
         switch(i.name) {
@@ -222,7 +222,7 @@ function addCustomUrl(url, g) {
     inp.type = 'text'
     inp.className = 'url'
     inp.name = 'url'
-    inp.value = url
+    inp.value = url ? url : ''
     td.appendChild(inp)
     tr.appendChild(td)
     //gesture
@@ -231,7 +231,7 @@ function addCustomUrl(url, g) {
     gurl.type = 'text'
     gurl.className = 'gurl'
     gurl.name = 'gurl'
-    gurl.value = g
+    gurl.value = g ? g : ''
     td.appendChild(gurl)
     tr.appendChild(td)
 
