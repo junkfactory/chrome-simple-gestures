@@ -14,6 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.   
 */
+const $ = function (path) {
+    if (path) {
+        var objs = document.querySelectorAll(path)
+        return objs.length > 1 ? objs : objs.item(0)
+    }
+    return document;
+}
 
 colorNameToCode = {
     "red": "ff3300",
@@ -52,15 +59,15 @@ function createOptions(config) {
 
     if (Object.keys(gests).length == 0)
         gests = invertHash(defaultGestures);
-    
-    div = document.getElementById("optsTab");
+
+    div = $("#optsTab");
     for (key in commandMapping) {
         tr = div.insertRow(div.rows.length)
-        td = document.createElement('td')
-        td.appendChild(document.createTextNode(key))
+        td = $().createElement('td')
+        td.appendChild($().createTextNode(key))
         tr.appendChild(td)
-        td = document.createElement('td')
-        inp = document.createElement('input')
+        td = $().createElement('td')
+        inp = $().createElement('input')
         inp.type = 'text'
         if (gests[commandMapping[key]])
             inp.value = gests[commandMapping[key]]
@@ -78,19 +85,19 @@ function saveConfiguration(e) {
         gestures: {}
     };
 
-    select = document.getElementById("color");
+    select = $("#color");
     value = select.children[select.selectedIndex].value;
     config.trailColor = colorNameToCode[value];
 
-    select = document.getElementById("width");
+    select = $("#width");
     config.trailWidth = select.children[select.selectedIndex].value;
 
-    var trail = document.getElementById('trail');
+    var trail = $('#trail');
     config.trailEnabled = trail.checked;
 
-    config.rockerEnabled = document.getElementById('rockerEnabled').checked;
+    config.rockerEnabled = $('#rockerEnabled').checked;
 
-    inputs = document.getElementsByTagName('input')
+    inputs = $('input')
     for (i = 0; i < inputs.length; i++) {
         s = inputs[i].parentElement.parentElement.children[0].textContent
         if (inputs[i].value.length > 0)
@@ -98,10 +105,10 @@ function saveConfiguration(e) {
         else
             delete config.gestures[commandMapping[s]];
     }
-    chrome.storage.local.set({simple_gestures_config: config}, function() {
-        chrome.runtime.sendMessage({msg: "config.update", updatedCconfig: config}, result => {
+    chrome.storage.local.set({ simple_gestures_config: config }, function () {
+        chrome.runtime.sendMessage({ msg: "config.update", updatedCconfig: config }, result => {
             // Update status to let user know options were saved.
-            var status = document.getElementById("status");
+            var status = $("#status");
             status.innerHTML = result.resp;
             setTimeout(() => {
                 status.innerHTML = ''
@@ -116,13 +123,13 @@ function restoreOptions() {
     chrome.storage.local.get("simple_gestures_config", (result) => {
         var config = result.simple_gestures_config;
 
-        var trailEnabled = document.getElementById('trail');
+        var trailEnabled = $('#trail');
         trailEnabled.checked = config.trailEnabled;
 
-        var rockerEnabled = document.getElementById('rockerEnabled');
+        var rockerEnabled = $('#rockerEnabled');
         rockerEnabled.checked = config.rockerEnabled;
 
-        var select = document.getElementById("color");
+        var select = $("#color");
         value = colorCodeToName[config.trailColor];
         if (!value) value = "red"
         for (var i = 0; i < select.children.length; i++) {
@@ -132,8 +139,8 @@ function restoreOptions() {
                 break;
             }
         }
-    
-        select = document.getElementById("width");
+
+        select = $("#width");
         var value = config.trailWidth;
         if (!value) value = 3
         for (var i = 0; i < select.children.length; i++) {
@@ -147,15 +154,13 @@ function restoreOptions() {
         createOptions(config);
     });
 
-    var tabNav = document.getElementsByName('tabs')
+    var tabNav = $('input[name=tabs]')
     tabNav.forEach(t => {
         t.addEventListener('click', e => {
-            for (const c of document.getElementsByClassName('tab')) {
+            for (const c of $('.tab')) {
                 c.style.display = 'none'
             }
-            for (const s of document.getElementsByClassName(e.target.id)) {
-                s.style.display = 'block'
-            }
+            $('.' + e.target.id).style.display = 'block'
         })
     })
 }
@@ -163,30 +168,30 @@ function restoreOptions() {
 function addCustomUrl(e) {
     e.preventDefault()
     console.log("add custom url")
-    var urlTable = document.getElementById("customUrlTab");
+    var urlTable = $("#customUrlTab");
     var tr = urlTable.insertRow(urlTable.rows.length)
     //url
-    var td = document.createElement('td')
-    var inp = document.createElement('input')
+    var td = $().createElement('td')
+    var inp = $().createElement('input')
     inp.type = 'text'
     inp.className = 'url'
     inp.autofocus = true
     td.appendChild(inp)
     tr.appendChild(td)
     //gesture
-    td = document.createElement('td')
-    var gurl = document.createElement('input')
+    td = $().createElement('td')
+    var gurl = $().createElement('input')
     gurl.type = 'text'
     gurl.className = 'gurl'
     td.appendChild(gurl)
     tr.appendChild(td)
- 
-    td = document.createElement('td')
-    var removeLink = document.createElement('a')
+
+    td = $().createElement('td')
+    var removeLink = $().createElement('a')
     removeLink.className = 'addremove'
     removeLink.title = 'Click to remove custom url mappin'
     removeLink.href = '#'
-    removeLink.innerHTML = 'X'
+    removeLink.innerHTML = '-'
     removeLink.addEventListener('click', e => {
         console.log('remove', e.target.parentElement.parentElement)
     });
@@ -196,8 +201,8 @@ function addCustomUrl(e) {
     inp.focus()
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+$().addEventListener('DOMContentLoaded', function () {
     restoreOptions();
-    document.getElementById("option_form").addEventListener("submit", saveConfiguration);
-    document.getElementById('plus').addEventListener('click', addCustomUrl)
+    $("#option_form").addEventListener("submit", saveConfiguration);
+    $('#plus').addEventListener('click', addCustomUrl)
 });
