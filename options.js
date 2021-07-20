@@ -135,7 +135,15 @@ function displayError(errorInput, errorMessage) {
     for (const c of $('.tab')) {
         c.style.display = 'none'
     }
-    errorInput.closest('.tab').style.display = 'block'
+    errorInput.closest('.tab').classList.forEach(c => {
+        if (c.startsWith('config')) {
+            $('#' + c).dispatchEvent(new MouseEvent('click', {
+                bubbles: true,
+                cancelable: true,
+                view: window
+            }))
+        }
+    })
     errorInput.classList.add('error')
     var status = $('#status')
     if (status.innerHTML == '') {
@@ -148,19 +156,26 @@ function displayError(errorInput, errorMessage) {
 function validateConfiguration(optionForm) {
     var status = $('#status')
     status.innerHTML = ''
+    var definedGestures = []
     for (const i of optionForm.querySelectorAll('input[type=text]')) {
         i.classList.remove('error')
+        var gval = i.value.trim()
         switch(i.name) {
             case 'url':
                 try {
-                    new URL(i.value)
+                    new URL(gval)
                 } catch (error) {
                     displayError(i, 'Invalid url!')
                 }
                 break;
             case 'gvalue':
-                if (i.value.trim() == '' || !/^[DULR]*$/.test(i.value)) {
+                if (definedGestures.indexOf(gval) > -1) {
+                    displayError(i, 'Duplicate gesture defined.')
+                }
+                else if (gval == '' || !/^[DULR]*$/.test(gval)) {
                     displayError(i, 'Invalid gesture pattern!')
+                } else {
+                    definedGestures.push(gval)
                 }
                 break;
         }
@@ -195,7 +210,7 @@ function saveConfiguration(e) {
     for (const i of $('#option_form input')) {
         if (url == null && i.name == 'url') {
             url = i.value;
-        } else if (url != null && i.name == 'gurl') {
+        } else if (url != null && i.name == 'gvalue') {
             config.gestures[i.value] = url
             url = null
         } else {
@@ -255,15 +270,14 @@ function restoreOptions() {
 
         createOptions(config);
     });
-
-    var tabNav = $('input[name=tabs]')
-    tabNav.forEach(t => {
-        t.addEventListener('click', e => switchTab(e.target.id))
-    })
 }
 
 $().addEventListener('DOMContentLoaded', function () {
     restoreOptions();
+    var tabNav = $('input[name=tabs]')
+    tabNav.forEach(t => {
+        t.addEventListener('click', e => switchTab(e.target.id))
+    })
     $("#option_form").addEventListener("submit", saveConfiguration);
     $('#plus').addEventListener('click', e => {
         e.preventDefault()

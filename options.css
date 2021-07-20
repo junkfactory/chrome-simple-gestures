@@ -95,7 +95,7 @@ input[name="tabs"]:checked+label {
     border-bottom: 1px solid transparent;
 }
 
-input[name="tabs"]~.generalConfig {
+input[name="tabs"]~.configGeneral {
     display: block;
 }
 

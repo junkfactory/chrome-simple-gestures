@@ -30,11 +30,11 @@
 
 <body>
     <form id="option_form">
-        <input type="radio" name="tabs" id="generalConfig" checked>
-        <label for="generalConfig">General</label>
-        <input type="radio" name="tabs" id="customUrls">
-        <label for="customUrls">Custom Urls</label>
-        <div class="tab generalConfig">
+        <input type="radio" name="tabs" id="configGeneral" checked>
+        <label for="configGeneral">General</label>
+        <input type="radio" name="tabs" id="configUrl">
+        <label for="configUrl">Custom Urls</label>
+        <div class="tab configGeneral">
             <table id="optsTab">
                 <tr>
                     <td><label for="trail">Show Gesture Trails:</label></td>
@@ -86,7 +86,7 @@
             </table>
             <p class="note">If "Open New Tab" is assigned, right click + drag on a link will open that link.</p>
         </div>
-        <div class="tab customUrls">
+        <div class="tab configUrl">
             <table id="customUrlTab">
                 <tr>
                     <td colspan="3" class="note">Click on plus (+) to assign gestures to open urls in a new tab</td>
