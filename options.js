@@ -14,14 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.   
 */
-const $ = function (path) {
-    if (path) {
-        var objs = document.querySelectorAll(path)
-        return objs.length > 1 ? objs : objs.item(0)
-    }
-    return document;
-}
-
 const colorNameToCode = {
     "red": "ff3300",
     "green": "008000",
@@ -44,20 +36,6 @@ const commandMapping = {
     "Reload (bypass cache)": "reload",
     "Open New Tab": "newtab",
     "Close Current Tab": "closetab",
-}
-
-function invertHash(hash) {
-    inv = {}
-    for (key in hash)
-        inv[hash[key]] = key
-    return inv
-}
-
-function switchTab(tabId) {
-    for (const c of $('.tab')) {
-        c.style.display = 'none'
-    }
-    $('.' + tabId).style.display = 'block'
 }
 
 function createOptions(config) {
@@ -129,27 +107,6 @@ function addCustomUrl(url, g) {
     tr.appendChild(td)
     //focus on url input
     inp.focus()
-}
-
-function displayError(errorInput, errorMessage) {
-    for (const c of $('.tab')) {
-        c.style.display = 'none'
-    }
-    errorInput.closest('.tab').classList.forEach(c => {
-        if (c.startsWith('config')) {
-            $('#' + c).dispatchEvent(new MouseEvent('click', {
-                bubbles: true,
-                cancelable: true,
-                view: window
-            }))
-        }
-    })
-    errorInput.classList.add('error')
-    var status = $('#status')
-    if (status.innerHTML == '') {
-        errorInput.focus()
-    }
-    status.innerHTML = errorMessage
 }
 
 //validate configurations
