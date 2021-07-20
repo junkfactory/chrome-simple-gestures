@@ -46,6 +46,11 @@ input {
     border: 1px solid #fff;
 }
 
+input.error, input:focus.error {
+    border: 1px solid #f00;
+    outline: none;
+}
+
 a.addremove {
     font-weight: bold;
     color: #fff;

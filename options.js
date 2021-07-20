@@ -22,23 +22,23 @@ const $ = function (path) {
     return document;
 }
 
-colorNameToCode = {
+const colorNameToCode = {
     "red": "ff3300",
     "green": "008000",
     "blue": "00008B",
     "yellow": "FFFF00"
 }
 
-colorCodeToName = {
+const colorCodeToName = {
     "ff3300": "red",
     "008000": "green",
     "00008B": "blue",
     "FFFF00": "yellow"
 }
 
-defaultGestures = { "R": "forward", "L": "back", "D": "closetab" }
+const defaultGestures = { "R": "forward", "L": "back", "D": "closetab" }
 
-commandMapping = {
+const commandMapping = {
     "History Back": "back",
     "History Forward": "forward",
     "Reload (bypass cache)": "reload",
@@ -51,6 +51,13 @@ function invertHash(hash) {
     for (key in hash)
         inv[hash[key]] = key
     return inv
+}
+
+function switchTab(tabId) {
+    for (const c of $('.tab')) {
+        c.style.display = 'none'
+    }
+    $('.' + tabId).style.display = 'block'
 }
 
 function createOptions(config) {
@@ -69,6 +76,8 @@ function createOptions(config) {
         td = $().createElement('td')
         inp = $().createElement('input')
         inp.type = 'text'
+        inp.name = 'gvalue'
+        inp.id = commandMapping[key]
         if (gests[commandMapping[key]])
             inp.value = gests[commandMapping[key]]
         tr.appendChild(td)
@@ -87,26 +96,71 @@ function createOptions(config) {
     
 }
 
+function addCustomUrl(url, g) {
+    var urlTable = $("#customUrlTab");
+    var tr = urlTable.insertRow(urlTable.rows.length)
+    //url
+    var td = $().createElement('td')
+    var inp = $().createElement('input')
+    inp.type = 'text'
+    inp.name = 'url'
+    inp.value = url ? url : ''
+    td.appendChild(inp)
+    tr.appendChild(td)
+    //gesture
+    td = $().createElement('td')
+    var gurl = $().createElement('input')
+    gurl.type = 'text'
+    gurl.name = 'gvalue'
+    gurl.value = g ? g : ''
+    td.appendChild(gurl)
+    tr.appendChild(td)
+
+    td = $().createElement('td')
+    var removeLink = $().createElement('a')
+    removeLink.className = 'addremove'
+    removeLink.title = 'Click to remove custom url mappin'
+    removeLink.href = '#'
+    removeLink.innerHTML = '-'
+    removeLink.addEventListener('click', e => {
+        $('#customUrlTab tbody').removeChild(e.target.parentElement.parentElement)
+    });
+    td.appendChild(removeLink)
+    tr.appendChild(td)
+    //focus on url input
+    inp.focus()
+}
+
+function displayError(errorInput, errorMessage) {
+    for (const c of $('.tab')) {
+        c.style.display = 'none'
+    }
+    errorInput.closest('.tab').style.display = 'block'
+    errorInput.classList.add('error')
+    var status = $('#status')
+    if (status.innerHTML == '') {
+        errorInput.focus()
+    }
+    status.innerHTML = errorMessage
+}
+
 //validate configurations
 function validateConfiguration(optionForm) {
     var status = $('#status')
     status.innerHTML = ''
     for (const i of optionForm.querySelectorAll('input[type=text]')) {
-        i.style.borderColor = '#fff'
+        i.classList.remove('error')
         switch(i.name) {
             case 'url':
                 try {
                     new URL(i.value)
                 } catch (error) {
-                    i.style.borderColor = 'red'
-                    status.innerHTML = 'Invalid url!'
+                    displayError(i, 'Invalid url!')
                 }
                 break;
-            case 'gurl':
-                console.log('gurl', i.value)
+            case 'gvalue':
                 if (i.value.trim() == '' || !/^[DULR]*$/.test(i.value)) {
-                    i.style.borderColor = 'red'
-                    status.innerHTML = 'Invalid gesture pattern!'
+                    displayError(i, 'Invalid gesture pattern!')
                 }
                 break;
         }
@@ -204,50 +258,8 @@ function restoreOptions() {
 
     var tabNav = $('input[name=tabs]')
     tabNav.forEach(t => {
-        t.addEventListener('click', e => {
-            for (const c of $('.tab')) {
-                c.style.display = 'none'
-            }
-            $('.' + e.target.id).style.display = 'block'
-        })
+        t.addEventListener('click', e => switchTab(e.target.id))
     })
-}
-
-function addCustomUrl(url, g) {
-    var urlTable = $("#customUrlTab");
-    var tr = urlTable.insertRow(urlTable.rows.length)
-    //url
-    var td = $().createElement('td')
-    var inp = $().createElement('input')
-    inp.type = 'text'
-    inp.className = 'url'
-    inp.name = 'url'
-    inp.value = url ? url : ''
-    td.appendChild(inp)
-    tr.appendChild(td)
-    //gesture
-    td = $().createElement('td')
-    var gurl = $().createElement('input')
-    gurl.type = 'text'
-    gurl.className = 'gurl'
-    gurl.name = 'gurl'
-    gurl.value = g ? g : ''
-    td.appendChild(gurl)
-    tr.appendChild(td)
-
-    td = $().createElement('td')
-    var removeLink = $().createElement('a')
-    removeLink.className = 'addremove'
-    removeLink.title = 'Click to remove custom url mappin'
-    removeLink.href = '#'
-    removeLink.innerHTML = '-'
-    removeLink.addEventListener('click', e => {
-        $('#customUrlTab tbody').removeChild(e.target.parentElement.parentElement)
-    });
-    td.appendChild(removeLink)
-    tr.appendChild(td)
-    //focus on url input
-    inp.focus()
 }
 
 $().addEventListener('DOMContentLoaded', function () {
