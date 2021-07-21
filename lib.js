@@ -1,3 +1,5 @@
+const VALID_GESTURES = /^[DULR]*$/
+
 const $ = function (path) {
     if (path) {
         var objs = document.querySelectorAll(path)
@@ -7,37 +9,22 @@ const $ = function (path) {
 }
 
 function invertHash(hash) {
-    inv = {}
-    for (key in hash)
-        inv[hash[key]] = key
+    var inv = {}
+    for (key in hash) {
+        //don't invert urls
+        try {
+            inv[key] = new URL(hash[key]).toString().trim()
+        } catch (error) {
+            inv[hash[key]] = key
+        }
+    }
     return inv
 }
 
-function switchTab(tabId) {
-    for (const c of $('.tab')) {
-        c.style.display = 'none'
+function isUrl(value) {
+    try {
+        return new URL(value).toString().trim()
+    } catch (error) {
+        return value;
     }
-    $('.' + tabId).style.display = 'block'
 }
-
-function displayError(errorInput, errorMessage) {
-    for (const c of $('.tab')) {
-        c.style.display = 'none'
-    }
-    errorInput.closest('.tab').classList.forEach(c => {
-        if (c.startsWith('config')) {
-            $('#' + c).dispatchEvent(new MouseEvent('click', {
-                bubbles: true,
-                cancelable: true,
-                view: window
-            }))
-        }
-    })
-    errorInput.classList.add('error')
-    var status = $('#status')
-    if (status.innerHTML == '') {
-        errorInput.focus()
-    }
-    status.innerHTML = errorMessage
-}
-

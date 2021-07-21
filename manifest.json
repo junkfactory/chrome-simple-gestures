@@ -23,6 +23,8 @@
         "<all_urls>"
       ],
       "js": [
+        "lib.js",
+        "canvas.js",
         "simple_gestures.js"
       ],
       "all_frames": true,

@@ -38,6 +38,34 @@ const commandMapping = {
     "Close Current Tab": "closetab",
 }
 
+function switchTab(tabId) {
+    for (const c of $('.tab')) {
+        c.style.display = 'none'
+    }
+    $('.' + tabId).style.display = 'block'
+}
+
+function displayError(errorInput, errorMessage) {
+    for (const c of $('.tab')) {
+        c.style.display = 'none'
+    }
+    errorInput.closest('.tab').classList.forEach(c => {
+        if (c.startsWith('config')) {
+            $('#' + c).dispatchEvent(new MouseEvent('click', {
+                bubbles: true,
+                cancelable: true,
+                view: window
+            }))
+        }
+    })
+    errorInput.classList.add('error')
+    var status = $('#status')
+    if (status.innerHTML == '') {
+        errorInput.focus()
+    }
+    status.innerHTML = errorMessage
+}
+
 function createOptions(config) {
     var key, div, tr, td, select, inp, img, a
     var gests = "gestures" in config ? config.gestures : {};
@@ -120,7 +148,7 @@ function validateConfiguration(optionForm) {
         switch(i.name) {
             case 'url':
                 try {
-                    new URL(gval)
+                    i.value = new URL(gval).toString().trim()
                 } catch (error) {
                     displayError(i, 'Invalid url!')
                 }
@@ -129,7 +157,7 @@ function validateConfiguration(optionForm) {
                 if (definedGestures.indexOf(gval) > -1) {
                     displayError(i, 'Duplicate gesture defined.')
                 }
-                else if (gval == '' || !/^[DULR]*$/.test(gval)) {
+                else if (gval == '' || !VALID_GESTURES.test(gval)) {
                     displayError(i, 'Invalid gesture pattern!')
                 } else {
                     definedGestures.push(gval)
