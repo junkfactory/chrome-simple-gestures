@@ -30,12 +30,11 @@ const config = {
     }
 };
 
-chrome.action.onClicked.addListener((tab) => {
-    chrome.runtime.openOptionsPage();
-});
-
-
-chrome.runtime.onInstalled.addListener(() => {
+chrome.runtime.onInstalled.addListener(details => {
+    if (details && details.reason == 'update') {
+        chrome.action.setBadgeBackgroundColor({color:'#f00'})
+        chrome.action.setBadgeText({text: "New"})
+    }
     chrome.storage.local.get("simple_gestures_config", result => {
         if (result.simple_gestures_config) {
             Object.assign(config, result.simple_gestures_config);
@@ -102,7 +101,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             chrome.tabs.query({}, tabs => {
                 tabs.forEach(t => chrome.tabs.sendMessage(t.id, { msg: "tabs.config.update", updatedConfig: config }))
             });
-            sendResponse({ resp: "Configuration saved"})
+            sendResponse({ resp: "Configuration saved!"})
             break;
         case "config":
             sendResponse({ resp: config });
