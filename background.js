@@ -30,7 +30,11 @@ const config = {
     }
 };
 
-chrome.runtime.onInstalled.addListener(() => {
+chrome.runtime.onInstalled.addListener(details => {
+    if (details && details.reason == 'update') {
+        chrome.action.setBadgeBackgroundColor({color:'#f00'})
+        chrome.action.setBadgeText({text: "New"})
+    }
     chrome.storage.local.get("simple_gestures_config", result => {
         if (result.simple_gestures_config) {
             Object.assign(config, result.simple_gestures_config);

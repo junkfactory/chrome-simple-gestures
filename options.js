@@ -258,6 +258,7 @@ function restoreOptions() {
 }
 
 $().addEventListener('DOMContentLoaded', function () {
+    chrome.action.setBadgeText({text: ""})
     restoreOptions();
     var tabNav = $('input[name=tabs]')
     tabNav.forEach(t => {
