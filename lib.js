@@ -23,8 +23,9 @@ function invertHash(hash) {
 
 function isUrl(value) {
     try {
-        return new URL(value).toString().trim()
+        new URL(value)
+        return true;
     } catch (error) {
-        return value;
+        return false;
     }
 }
