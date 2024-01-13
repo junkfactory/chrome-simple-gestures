@@ -22,7 +22,7 @@ var currentGesture = "", previousGesture = ""
 var pi = 3.14159
 var suppress = 1
 var myGests, gestureActionMap;
-var link, ls, myColor = "red", myWidth = 3
+var ls, myColor = "red", myWidth = 3
 var loaded = false
 var link = null
 
@@ -38,15 +38,7 @@ function onStart(event) {
     currentGesture = ""
     previousGesture = ""
     moved = false
-    if (event.target.href) {
-        link = event.target.href
-    }
-    else if (event.target.parentElement.href) {
-        link = event.target.parentElement.href
-    }
-    else {
-        link = null
-    }
+    link = determineLink(event.target, 10)
 }
 
 function onMove(event) {
@@ -170,3 +162,13 @@ function watchGestures(name) {
 }
 
 document.addEventListener('DOMContentLoaded', watchGestures);
+
+function determineLink(target, allowedDrillCount){
+    if (target.href) {
+        return target.href
+    }
+    if(target.parentElement && allowedDrillCount > 0){
+        return determineLink(target.parentElement, allowedDrillCount - 1)
+    }
+    return null
+}
