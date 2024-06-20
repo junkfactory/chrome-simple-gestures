@@ -18,92 +18,123 @@
 -->
 
 <html>
-
-<head>
+  <head>
     <title>SimpleGestures Options</title>
-    <link rel="stylesheet" href="options.css">
-</head>
+    <link rel="stylesheet" href="options.css" />
+  </head>
 
-<h1><img class="logo" src="app_icon.png">SimpleGestures Configuration</h1>
-<p>Use mouse right button to hold and drag to activate a gesture.</p>
-<p class="note">Note: Valid gesture values are U (up), D (down), L (left), R (right)</p>
+  <h1><img class="logo" src="app_icon.png" />SimpleGestures Configuration</h1>
+  <p>Use mouse right button to hold and drag to activate a gesture.</p>
+  <p class="note">
+    Note: Valid gesture values are U (up), D (down), L (left), R (right)
+  </p>
 
-<body>
+  <body>
     <form id="option_form">
-        <input type="radio" name="tabs" id="configGeneral" checked>
-        <label for="configGeneral">General</label>
-        <input type="radio" name="tabs" id="configUrl">
-        <label for="configUrl">Custom Urls <span class="beta">(beta)</span></label>
-        <div class="tab configGeneral">
-            <table id="optsTab">
-                <tr>
-                    <td><label for="trail">Show Gesture Trails:</label></td>
-                    <td>
-                        <input type='checkbox' id='trail'></input>
-                    </td>
-                </tr>
+      <div>
+        <label for="domain">
+          Enabled on <span id="domain_url">www.example.com</span>
+          <input type="checkbox" id="domain" />
+        </label>
+      </div>
+      <input
+        type="radio"
+        name="tabs"
+        id="configGeneral"
+        checked
+        class="config"
+      />
+      <label for="configGeneral">General</label>
+      <input type="radio" name="tabs" id="configUrl" class="config" />
+      <label for="configUrl">
+        Custom Urls <span class="beta">(beta)</span>
+      </label>
+      <div class="tab configGeneral">
+        <table id="optsTab">
+          <tr>
+            <td><label for="trail">Show Gesture Trails:</label></td>
+            <td>
+              <input type="checkbox" id="trail" class="config" />
+            </td>
+          </tr>
 
-                <tr>
-                    <td>Gesture Color:</td>
-                    <td>
-                        <select id="color">
-                            <option value="red" selected>red</option>
-                            <option value="green">green</option>
-                            <option value="blue">blue</option>
-                            <option value="yellow">yellow</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Gesture Width:</td>
-                    <td>
-                        <select id="width">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3" selected>3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2">&nbsp;</td>
-                </tr>
-                <tr>
-                    <td><label for="rockerEnabled">Enable rocker gesture:</label></td>
-                    <td><input type="checkbox" id="rockerEnabled"></td>
-                </tr>
-                <tr>
-                    <td colspan="2" class="note">Hold left mouse button then click right to go to next tab. Hold right mouse button then click left for previous tab.</td>
-                </tr>
-                <tr>
-                    <td colspan="2">&nbsp;</td>
-                </tr>
-                <tr class="header">
-                    <th>Action</th>
-                    <th>Gesture</th>
-                </tr>
-            </table>
-            <p class="note">If "Open New Tab" is assigned, right click + drag on a link will open that link.</p>
-        </div>
-        <div class="tab configUrl">
-            <table id="customUrlTab">
-                <tr>
-                    <td colspan="3" class="note">Click on plus (+) to assign gestures to open urls in a new tab</td>
-                </tr>
-                <tr class="header">
-                    <th>Url (http/https)</th>
-                    <th>Gesture</th>
-                    <th style="width: 10px;"><a id="plus" href="#" title="Click to add new custom url" class="addremove">+</a></th>
-                </tr>
-            </table>
-        </div>
-        <div>
-            <input type="submit" value="Save configuration"> <div id="status"></div>
-        </div>
+          <tr>
+            <td>Gesture Color:</td>
+            <td>
+              <select id="color" class="config">
+                <option value="red" selected>red</option>
+                <option value="green">green</option>
+                <option value="blue">blue</option>
+                <option value="yellow">yellow</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>Gesture Width:</td>
+            <td>
+              <select id="width" class="config">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3" selected>3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">&nbsp;</td>
+          </tr>
+          <tr>
+            <td><label for="rockerEnabled">Enable rocker gesture:</label></td>
+            <td><input type="checkbox" id="rockerEnabled" class="config" /></td>
+          </tr>
+          <tr>
+            <td colspan="2" class="note">
+              Hold left mouse button then click right to go to next tab. Hold
+              right mouse button then click left for previous tab.
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">&nbsp;</td>
+          </tr>
+          <tr class="header">
+            <th>Action</th>
+            <th>Gesture</th>
+          </tr>
+        </table>
+        <p class="note">
+          If "Open New Tab" is assigned, right click + drag on a link will open
+          that link.
+        </p>
+      </div>
+      <div class="tab configUrl">
+        <table id="customUrlTab">
+          <tr>
+            <td colspan="3" class="note">
+              Click on plus (+) to assign gestures to open urls in a new tab
+            </td>
+          </tr>
+          <tr class="header">
+            <th>Url (http/https)</th>
+            <th>Gesture</th>
+            <th style="width: 10px">
+              <a
+                id="plus"
+                href="#"
+                title="Click to add new custom url"
+                class="addremove"
+                >+</a
+              >
+            </th>
+          </tr>
+        </table>
+      </div>
+      <div>
+        <input type="submit" value="Save configuration" />
+        <div id="status"></div>
+      </div>
     </form>
-</body>
-<script src="lib.js"></script>
-<script src="options.js"></script>
-
+  </body>
+  <script src="lib.js"></script>
+  <script src="options.js"></script>
 </html>
