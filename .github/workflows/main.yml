@@ -1,18 +1,24 @@
-name: Chrome Extension CI
+name: Release on push to master
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - master
+      - main
 
 jobs:
-  build_release:
+  release-on-push:
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Archive production artifacts
-        uses: actions/upload-artifact@v4
+      - id: release
+        uses: rymndhng/release-on-push-action@master
         with:
-          name: chrome-simple-gestures-${{ github.event.release.tag_name }}
-          path: |
-            ./*
-            !.git*
+          bump_version_scheme: minor
+          tag_prefix: v
+
+      - name: Check Output Parameters
+        run: |
+          echo "Got tag name ${{ steps.release.outputs.tag_name }}"
+          echo "Got release version ${{ steps.release.outputs.version }}"
+          echo "Upload release artifacts to ${{ steps.release.outputs.upload_url }}"
