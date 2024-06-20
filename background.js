@@ -1,20 +1,26 @@
-/*
- *  Copyright (C) 2013  AJ Ribeiro
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+// The MIT License (MIT)
+// ----------------------------------------------
+//
+// Copyright © 2024 junkfactory@gmail.com
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy of
+// this software and associated documentation files (the “Software”), to deal in
+// the Software without restriction, including without limitation the rights to use,
+// copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the
+// Software, and to permit persons to whom the Software is furnished to do so,
+// subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR
+// A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+// ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH
+// THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+importScripts("browser.js");
 //default configuration
 const config = {
   rockerEnabled: true,
@@ -30,22 +36,22 @@ const config = {
   },
 };
 
-chrome.runtime.onInstalled.addListener((details) => {
+browser.runtime.onInstalled.addListener((details) => {
   if (details && details.reason == "update") {
-    chrome.action.setBadgeBackgroundColor({ color: "#f00" });
-    chrome.action.setBadgeText({ text: "New" });
+    browser.browserAction.setBadgeBackgroundColor({ color: "#f00" });
+    browser.browserAction.setBadgeText({ text: "New" });
   }
-  chrome.storage.local.get("simple_gestures_config", (result) => {
+  browser.storage.local.get("simple_gestures_config", (result) => {
     if (result.simple_gestures_config) {
       Object.assign(config, result.simple_gestures_config);
     } else {
-      chrome.storage.local.set({ simple_gestures_config: config });
+      browser.storage.local.set({ simple_gestures_config: config });
     }
   });
 });
 
 function withActiveTab(callback) {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
+  browser.tabs.query({ active: true, currentWindow: true }, (tab) => {
     callback(tab[0]);
   });
 }
@@ -66,26 +72,28 @@ function switchTab(tabs, direction) {
   } else if (nexttab > indices.length - 1) {
     nexttab = 0;
   }
-  chrome.tabs.highlight({
+  browser.tabs.highlight({
     tabs: indices[nexttab].index,
     windowId: indices[nexttab].windowId,
   });
 }
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
   switch (request.msg) {
     case "back":
-      withActiveTab((tab) => chrome.tabs.goBack(tab.id));
+      withActiveTab((tab) => browser.tabs.goBack(tab.id));
       break;
     case "forward":
-      withActiveTab((tab) => chrome.tabs.goForward(tab.id));
+      withActiveTab((tab) => browser.tabs.goForward(tab.id));
       break;
     case "reload":
-      withActiveTab((tab) => chrome.tabs.reload(tab.id, { bypassCache: true }));
+      withActiveTab((tab) =>
+        browser.tabs.reload(tab.id, { bypassCache: true }),
+      );
       break;
     case "closetab":
       withActiveTab((tab) => {
-        chrome.tabs.remove(tab.id, function () {
+        browser.tabs.remove(tab.id, function () {
           sendResponse({ resp: "tab closed" });
         });
       });
@@ -95,18 +103,20 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       if (request.url && request.url.length > 0) {
         createProperties.url = request.url;
       }
-      chrome.tabs.create(createProperties, function (result) {
+      browser.tabs.create(createProperties, function (result) {
         sendResponse({ resp: result });
       });
       break;
     case "config.update":
       Object.assign(config, request.updatedCconfig);
-      chrome.tabs.query({}, (tabs) => {
+      browser.tabs.query({}).then((tabs) => {
         tabs.forEach((t) => {
-          chrome.tabs.sendMessage(t.id, {
-            msg: "tabs.config.update",
-            updatedConfig: config,
-          });
+          browser.tabs
+            .sendMessage(t.id, {
+              msg: "tabs.config.update",
+              updatedConfig: config,
+            })
+            .catch((error) => console.warn(error));
         });
       });
       sendResponse({ resp: "Configuration saved!" });
@@ -115,12 +125,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       sendResponse({ resp: config });
       break;
     case "nexttab":
-      chrome.tabs.query({}, (r) => {
+      browser.tabs.query({}, (r) => {
         switchTab(r, 1);
       });
       break;
     case "prevtab":
-      chrome.tabs.query({}, (r) => {
+      browser.tabs.query({}, (r) => {
         switchTab(r, -1);
       });
       break;

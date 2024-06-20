@@ -1,19 +1,25 @@
-/*
- *  Copyright (C) 2013  AJ Ribeiro
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+// The MIT License (MIT)
+// ----------------------------------------------
+//
+// Copyright © 2024 junkfactory@gmail.com
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy of
+// this software and associated documentation files (the “Software”), to deal in
+// the Software without restriction, including without limitation the rights to use,
+// copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the
+// Software, and to permit persons to whom the Software is furnished to do so,
+// subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR
+// A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+// ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH
+// THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 const colorNameToCode = {
   red: "ff3300",
   green: "008000",
@@ -85,7 +91,7 @@ function createOptions(config) {
     inp.type = "text";
     inp.name = "gvalue";
     inp.id = commandMapping[key];
-    inp.className = "config";
+    inp.className = "config gesture";
     if (gests[commandMapping[key]]) inp.value = gests[commandMapping[key]];
     tr.appendChild(td);
     td.appendChild(inp);
@@ -170,18 +176,18 @@ function validateConfiguration(optionForm) {
 }
 
 // Saves options to local storage.
-function saveConfiguration(e) {
+async function saveConfiguration(e) {
   e.preventDefault();
   if (!validateConfiguration(e.target)) {
     return false;
   }
-  var select, value;
-  var config = {
-    gestures: {},
-  };
+  let store = await browser.storage.local.get("simple_gestures_config");
+  console.log("storage", store);
+  let config = store?.simple_gestures_config || { gestures: {} };
+  console.debug("config", config);
 
-  select = $("#color");
-  value = select.children[select.selectedIndex].value;
+  let select = $("#color");
+  let value = select.children[select.selectedIndex].value;
   config.trailColor = colorNameToCode[value];
 
   select = $("#width");
@@ -192,11 +198,15 @@ function saveConfiguration(e) {
 
   config.rockerEnabled = $("#rockerEnabled").checked;
 
+  let disabled_domains = config?.disabled_domains || [];
   const domainUrl = $("#domain_url").innerHTML;
   const domainEnabled = $("#domain").checked;
-  let domains = config?.domains || {};
-  domains[domainUrl] = domainEnabled;
-  config.domains = domains;
+  if (domainEnabled) {
+    removeFromArray(disabled_domains, domainUrl);
+  } else {
+    addToArrayIfNotExists(disabled_domains, domainUrl);
+  }
+  config.disabled_domains = disabled_domains;
 
   var url = null;
   for (const i of $("#option_form input")) {
@@ -214,34 +224,38 @@ function saveConfiguration(e) {
       }
     }
   }
-
-  chrome.storage.local.set({ simple_gestures_config: config }, function () {
-    chrome.runtime.sendMessage(
-      { msg: "config.update", updatedCconfig: config },
-      (result) => {
-        // Update status to let user know options were saved.
-        var status = $("#status");
-        status.innerHTML = result.resp;
-        setTimeout(() => {
-          status.innerHTML = "";
-        }, 5000);
-      },
-    );
+  await browser.storage.local.set({ simple_gestures_config: config });
+  let result = await browser.runtime.sendMessage({
+    msg: "config.update",
+    updatedCconfig: config,
   });
+
+  // Update status to let user know options were saved.
+  var status = $("#status");
+  status.innerHTML = result.resp;
+  setTimeout(() => {
+    status.innerHTML = "";
+  }, 5000);
   return false;
 }
 
 async function getCurrentUrl() {
-  let [tab] = await chrome.tabs.query({
+  let [tab] = await browser.tabs.query({
     active: true,
-    lastFocusedWindow: true,
+    currentWindow: true,
   });
   return new URL(tab.url);
 }
 
+function extensionToggle(e) {
+  $(".config").forEach((c) => {
+    c.disabled = !e.target.checked;
+  });
+}
+
 // Restores select box state to saved value from local storage.
 function restoreOptions() {
-  chrome.storage.local.get("simple_gestures_config", (result) => {
+  browser.storage.local.get("simple_gestures_config", (result) => {
     var config = result.simple_gestures_config;
     var trailEnabled = $("#trail");
     trailEnabled.checked = config.trailEnabled;
@@ -274,22 +288,17 @@ function restoreOptions() {
     getCurrentUrl().then((url) => {
       $("#domain_url").innerHTML = url.hostname;
       let domainCheckbox = $("#domain");
-      const enabled = config?.domains?.[url.hostname];
-      domainCheckbox.checked = enabled === undefined ? true : enabled;
+      const disabled =
+        config?.disabled_domains?.includes(url.hostname) || false;
+      domainCheckbox.checked = !disabled;
       createOptions(config);
       extensionToggle({ target: domainCheckbox });
     });
   });
 }
 
-function extensionToggle(e) {
-  $(".config").forEach((c) => {
-    c.disabled = !e.target.checked;
-  });
-}
-
 $().addEventListener("DOMContentLoaded", function () {
-  chrome.action.setBadgeText({ text: "" });
+  browser.browserAction.setBadgeText({ text: "" });
   restoreOptions();
   var tabNav = $("input[name=tabs]");
   tabNav.forEach((t) => {
