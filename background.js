@@ -38,8 +38,8 @@ const config = {
 
 browser.runtime.onInstalled.addListener((details) => {
   if (details && details.reason == "update") {
-    browser.browserAction.setBadgeBackgroundColor({ color: "#f00" });
-    browser.browserAction.setBadgeText({ text: "New" });
+    browser.action.setBadgeBackgroundColor({ color: "#f00" });
+    browser.action.setBadgeText({ text: "New" });
   }
   browser.storage.local.get("simple_gestures_config", (result) => {
     if (result.simple_gestures_config) {

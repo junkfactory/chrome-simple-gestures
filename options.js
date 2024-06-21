@@ -298,7 +298,7 @@ function restoreOptions() {
 }
 
 $().addEventListener("DOMContentLoaded", function () {
-  browser.browserAction.setBadgeText({ text: "" });
+  browser.action.setBadgeText({ text: "" });
   restoreOptions();
   var tabNav = $("input[name=tabs]");
   tabNav.forEach((t) => {
