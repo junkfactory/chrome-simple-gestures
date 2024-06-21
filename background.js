@@ -50,6 +50,10 @@ browser.runtime.onInstalled.addListener((details) => {
   });
 });
 
+if (browser.browserSettings && browser.browserSettings.contextMenuShowEvent) {
+  browser.browserSettings.contextMenuShowEvent.set({ value: "mouseup" });
+}
+
 function withActiveTab(callback) {
   browser.tabs.query({ active: true, currentWindow: true }, (tab) => {
     callback(tab[0]);
