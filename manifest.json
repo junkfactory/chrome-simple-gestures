@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "SimpleGestures",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "description": "A very simple mouse gestures extension",
   "action": {
     "default_title": "Click for SimpleGestures options",
