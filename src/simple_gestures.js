@@ -142,7 +142,7 @@ function executeGesture() {
       link = action;
       action = "newtab";
     }
-    browser.runtime.sendMessage({ msg: action, url: link }, (result) => {
+    browser.runtime.sendMessage({ msg: action, url: link }).then((result) => {
       if (result != null) {
         link = null;
       }
@@ -162,11 +162,14 @@ function updateConfig(config) {
 }
 
 function watchGestures() {
-  browser.runtime.sendMessage({ msg: "config" }, (response) => {
-    if (response) {
-      updateConfig(response.resp);
-    }
-  });
+  browser.runtime.sendMessage({ msg: "config" }).then(
+    (response) => {
+      if (response) {
+        updateConfig(response.resp);
+      }
+    },
+    (error) => console.error(error),
+  );
 
   browser.runtime.onMessage.addListener((request) => {
     switch (request.msg) {
