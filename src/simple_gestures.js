@@ -142,11 +142,14 @@ function executeGesture() {
       link = action;
       action = "newtab";
     }
-    browser.runtime.sendMessage({ msg: action, url: link }).then((result) => {
-      if (result != null) {
-        link = null;
-      }
-    });
+    browser.runtime
+      .sendMessage({ msg: action, url: link })
+      .then((result) => {
+        if (result != null) {
+          link = null;
+        }
+      })
+      .catch((error) => console.error(`Failed to send ${action}`, error));
   }
 }
 

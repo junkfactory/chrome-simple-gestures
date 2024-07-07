@@ -20,6 +20,8 @@
 // ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH
 // THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+const IGNORE_DOMAIN = "IGNORE_DOMAIN";
+
 const colorNameToCode = {
   red: "ff3300",
   green: "008000",
@@ -67,7 +69,7 @@ function displayError(errorInput, errorMessage) {
     }
   });
   errorInput.classList.add("error");
-  var status = $("#status");
+  const status = $("#status");
   if (status.innerHTML == "") {
     errorInput.focus();
   }
@@ -75,8 +77,8 @@ function displayError(errorInput, errorMessage) {
 }
 
 function createOptions(config) {
-  var key, div, tr, td, inp;
-  var gests = "gestures" in config ? config.gestures : {};
+  let key, div, tr, td, inp;
+  let gests = "gestures" in config ? config.gestures : {};
 
   if (Object.keys(gests).length == 0) gests = invertHash(defaultGestures);
 
@@ -109,11 +111,11 @@ function createOptions(config) {
 }
 
 function addCustomUrl(url, g) {
-  var urlTable = $("#customUrlTab");
-  var tr = urlTable.insertRow(urlTable.rows.length);
+  const urlTable = $("#customUrlTab");
+  const tr = urlTable.insertRow(urlTable.rows.length);
   //url
-  var td = $().createElement("td");
-  var inp = $().createElement("input");
+  let td = $().createElement("td");
+  const inp = $().createElement("input");
   inp.type = "text";
   inp.name = "url";
   inp.value = url ? url : "";
@@ -122,7 +124,7 @@ function addCustomUrl(url, g) {
   tr.appendChild(td);
   //gesture
   td = $().createElement("td");
-  var gurl = $().createElement("input");
+  const gurl = $().createElement("input");
   gurl.type = "text";
   gurl.name = "gvalue";
   gurl.value = g ? g : "";
@@ -131,7 +133,7 @@ function addCustomUrl(url, g) {
   tr.appendChild(td);
 
   td = $().createElement("td");
-  var removeLink = $().createElement("a");
+  const removeLink = $().createElement("a");
   removeLink.className = "addremove";
   removeLink.title = "Click to remove custom url mappin";
   removeLink.href = "#";
@@ -147,12 +149,12 @@ function addCustomUrl(url, g) {
 
 //validate configurations
 function validateConfiguration(optionForm) {
-  var status = $("#status");
+  const status = $("#status");
   status.innerHTML = "";
-  var definedGestures = [];
+  const definedGestures = [];
   for (const i of optionForm.querySelectorAll("input[type=text]")) {
     i.classList.remove("error");
-    var gval = i.value.trim();
+    const gval = i.value.trim();
     switch (i.name) {
       case "url":
         try {
@@ -193,22 +195,24 @@ async function saveConfiguration(e) {
   select = $("#width");
   config.trailWidth = select.children[select.selectedIndex].value;
 
-  var trail = $("#trail");
+  const trail = $("#trail");
   config.trailEnabled = trail.checked;
 
   config.rockerEnabled = $("#rockerEnabled").checked;
 
   let disabled_domains = config?.disabled_domains || [];
   const domainUrl = $("#domain_url").innerHTML;
-  const domainEnabled = $("#domain").checked;
-  if (domainEnabled) {
-    removeFromArray(disabled_domains, domainUrl);
-  } else {
-    addToArrayIfNotExists(disabled_domains, domainUrl);
+  if (domainUrl !== IGNORE_DOMAIN) {
+    const domainEnabled = $("#domain").checked;
+    if (domainEnabled) {
+      removeFromArray(disabled_domains, domainUrl);
+    } else {
+      addToArrayIfNotExists(disabled_domains, domainUrl);
+    }
   }
   config.disabled_domains = disabled_domains;
 
-  var url = null;
+  let url = null;
   for (const i of $("#option_form input")) {
     if (url == null && i.name == "url") {
       url = i.value;
@@ -216,7 +220,7 @@ async function saveConfiguration(e) {
       config.gestures[i.value] = url;
       url = null;
     } else {
-      var s = i.parentElement.parentElement.children[0].textContent;
+      const s = i.parentElement.parentElement.children[0].textContent;
       if (i.value.length > 0) {
         config.gestures[commandMapping[s]] = i.value;
       } else {
@@ -225,13 +229,13 @@ async function saveConfiguration(e) {
     }
   }
   await browser.storage.local.set({ simple_gestures_config: config });
-  let result = await browser.runtime.sendMessage({
+  const result = await browser.runtime.sendMessage({
     msg: "config.update",
     updatedCconfig: config,
   });
 
   // Update status to let user know options were saved.
-  var status = $("#status");
+  const status = $("#status");
   status.innerHTML = result.resp;
   setTimeout(() => {
     status.innerHTML = "";
@@ -244,7 +248,7 @@ async function getCurrentUrl() {
     active: true,
     currentWindow: true,
   });
-  return new URL(tab.url);
+  return new URL(tab?.url || "about:blank");
 }
 
 function extensionToggle(e) {
@@ -256,18 +260,18 @@ function extensionToggle(e) {
 // Restores select box state to saved value from local storage.
 function restoreOptions() {
   browser.storage.local.get("simple_gestures_config", (result) => {
-    var config = result.simple_gestures_config;
-    var trailEnabled = $("#trail");
+    const config = result.simple_gestures_config;
+    const trailEnabled = $("#trail");
     trailEnabled.checked = config.trailEnabled;
 
-    var rockerEnabled = $("#rockerEnabled");
+    const rockerEnabled = $("#rockerEnabled");
     rockerEnabled.checked = config.rockerEnabled;
 
-    var select = $("#color");
-    value = colorCodeToName[config.trailColor];
+    let select = $("#color");
+    let value = colorCodeToName[config.trailColor];
     if (!value) value = "red";
-    for (var i = 0; i < select.children.length; i++) {
-      var child = select.children[i];
+    for (let i = 0; i < select.children.length; i++) {
+      const child = select.children[i];
       if (child.value == value) {
         child.selected = "true";
         break;
@@ -275,10 +279,10 @@ function restoreOptions() {
     }
 
     select = $("#width");
-    var value = config.trailWidth;
+    value = config.trailWidth;
     if (!value) value = 3;
-    for (var i = 0; i < select.children.length; i++) {
-      var child = select.children[i];
+    for (let i = 0; i < select.children.length; i++) {
+      const child = select.children[i];
       if (child.value == value) {
         child.selected = "true";
         break;
@@ -286,11 +290,18 @@ function restoreOptions() {
     }
 
     getCurrentUrl().then((url) => {
-      $("#domain_url").innerHTML = url.hostname;
       let domainCheckbox = $("#domain");
-      const disabled =
-        config?.disabled_domains?.includes(url.hostname) || false;
-      domainCheckbox.checked = !disabled;
+      const hostname = url.hostname.trim();
+      if (hostname.length > 0) {
+        $("#domain_container").style.display = "block";
+        $("#domain_url").innerHTML = hostname;
+        const disabled = config?.disabled_domains?.includes(hostname) || false;
+        domainCheckbox.checked = !disabled;
+      } else {
+        $("#domain_container").style.display = "none";
+        $("#domain_url").innerHTML = IGNORE_DOMAIN;
+        domainCheckbox.checked = true;
+      }
       createOptions(config);
       extensionToggle({ target: domainCheckbox });
     });
@@ -300,7 +311,7 @@ function restoreOptions() {
 $().addEventListener("DOMContentLoaded", function () {
   browser.action.setBadgeText({ text: "" });
   restoreOptions();
-  var tabNav = $("input[name=tabs]");
+  const tabNav = $("input[name=tabs]");
   tabNav.forEach((t) => {
     t.addEventListener("click", (e) => switchTab(e.target.id));
   });

@@ -21,8 +21,12 @@
 // THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 function createCanvas() {
-  var canvas = document.createElement("canvas");
-  canvas.id = "canvas";
+  let canvas = $("#canvas");
+  if (!canvas) {
+    canvas = document.createElement("canvas");
+    canvas.id = "canvas";
+    document.body.appendChild(canvas);
+  }
   canvas.style.width = document.body.scrollWidth;
   canvas.style.height = document.body.scrollHeight;
   canvas.width = window.document.body.scrollWidth;
@@ -32,22 +36,23 @@ function createCanvas() {
   canvas.style.overflow = "visible";
   canvas.style.position = "absolute";
   canvas.style.zIndex = "10000";
-  document.body.appendChild(canvas);
 }
 
 function destroyCanvas() {
-  var canvas = document.getElementById("canvas");
+  const canvas = $("#canvas");
   if (canvas) {
     try {
       document.body.removeChild(canvas);
     } catch (error) {}
+  } else {
+    console.warn("Canvas not found");
   }
 }
 
 function draw(x, y) {
-  var canvas = document.getElementById("canvas");
+  const canvas = $("#canvas");
   if (canvas) {
-    var ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d");
     ctx.beginPath();
     ctx.strokeStyle = "#" + myColor;
     ctx.lineWidth = myWidth;
@@ -56,5 +61,7 @@ function draw(x, y) {
     ctx.stroke();
     lx = x;
     ly = y;
+  } else {
+    console.warn("Canvas not found");
   }
 }

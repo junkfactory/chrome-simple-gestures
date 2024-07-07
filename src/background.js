@@ -56,21 +56,23 @@ if (browser.browserSettings && browser.browserSettings.contextMenuShowEvent) {
 
 function withActiveTab(callback) {
   browser.tabs.query({ active: true, currentWindow: true }, (tab) => {
-    callback(tab[0]);
+    callback(tab[0]).catch((e) => {
+      console.warn(e.message);
+    });
   });
 }
 
 function switchTab(tabs, direction) {
-  var indices = [];
-  var activeIndex = -1;
-  for (var i = 0; i < tabs.length; i++) {
-    var t = tabs[i];
+  const indices = [];
+  let activeIndex = -1;
+  for (let i = 0; i < tabs.length; i++) {
+    const t = tabs[i];
     indices.push(t);
     if (t.active) {
       activeIndex = i;
     }
   }
-  var nexttab = activeIndex + direction;
+  let nexttab = activeIndex + direction;
   if (nexttab < 0) {
     nexttab = indices.length - 1;
   } else if (nexttab > indices.length - 1) {
@@ -96,14 +98,10 @@ browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
       );
       break;
     case "closetab":
-      withActiveTab((tab) => {
-        browser.tabs.remove(tab.id, function () {
-          sendResponse({ resp: "tab closed" });
-        });
-      });
+      withActiveTab((tab) => browser.tabs.remove(tab.id));
       return true;
     case "newtab":
-      var createProperties = {};
+      const createProperties = {};
       if (request.url && request.url.length > 0) {
         createProperties.url = request.url;
       }
@@ -120,7 +118,12 @@ browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
               msg: "tabs.config.update",
               updatedConfig: config,
             })
-            .catch((error) => console.warn(error));
+            .catch((error) =>
+              console.warn(
+                "Unconnected tabs, please refresh the tab to connect",
+                error,
+              ),
+            );
         });
       });
       sendResponse({ resp: "Configuration saved!" });
