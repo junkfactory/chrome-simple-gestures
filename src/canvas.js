@@ -29,12 +29,16 @@ function createCanvas() {
   }
 
   let vw = Math.max(
+    window.screen.availWidth || 0,
     document.documentElement.clientWidth || 0,
     window.innerWidth || 0,
+    document.body.scrollWidth || 0,
   );
   let vh = Math.max(
+    window.screen.availHeight || 0,
     document.documentElement.clientHeight || 0,
     window.innerHeight || 0,
+    document.body.scrollHeight || 0,
   );
   canvas.style.width = canvas.width = vw;
   canvas.style.height = canvas.height = vh;

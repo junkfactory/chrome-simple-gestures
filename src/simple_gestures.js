@@ -36,6 +36,8 @@ var ls,
 var loaded = false;
 var link = null;
 var extensionEnabled = true;
+const elementFromPoint = document.elementFromPoint.bind(document);
+var currentElement = null;
 
 function onStart(event) {
   if (!loaded) {
@@ -95,6 +97,13 @@ document.onmousemove = function (event) {
     return;
   }
   //track the mouse if we are holding the right button
+  if (currentElement) {
+    currentElement.removeEventListener("mousedown", document.onmousedown);
+  }
+  currentElement = elementFromPoint(event.clientX, event.clientY);
+  if (currentElement) {
+    currentElement.addEventListener("mousedown", document.onmousedown);
+  }
   if (rmousedown) {
     onMove(event);
   }
