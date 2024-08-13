@@ -27,10 +27,17 @@ function createCanvas() {
     canvas.id = "canvas";
     document.body.appendChild(canvas);
   }
-  canvas.style.width = document.body.scrollWidth;
-  canvas.style.height = document.body.scrollHeight;
-  canvas.width = window.document.body.scrollWidth;
-  canvas.height = window.document.body.scrollHeight;
+
+  let vw = Math.max(
+    document.documentElement.clientWidth || 0,
+    window.innerWidth || 0,
+  );
+  let vh = Math.max(
+    document.documentElement.clientHeight || 0,
+    window.innerHeight || 0,
+  );
+  canvas.style.width = canvas.width = vw;
+  canvas.style.height = canvas.height = vh;
   canvas.style.left = "0px";
   canvas.style.top = "0px";
   canvas.style.overflow = "visible";
