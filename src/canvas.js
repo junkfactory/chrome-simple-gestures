@@ -28,22 +28,14 @@ function createCanvas() {
     document.body.appendChild(canvas);
   }
 
-  let vw = Math.max(
-    window.screen.availWidth || 0,
-    document.documentElement.clientWidth || 0,
-    window.innerWidth || 0,
-    document.body.scrollWidth || 0,
-  );
-  let vh = Math.max(
-    window.screen.availHeight || 0,
-    document.documentElement.clientHeight || 0,
-    window.innerHeight || 0,
-    document.body.scrollHeight || 0,
-  );
+  let vw = window.visualViewport.width - window.screenX;
+  let vh = window.visualViewport.height - window.screenY;
+
+  const canvas_top = window.visualViewport.pageTop + "px";
   canvas.style.width = canvas.width = vw;
   canvas.style.height = canvas.height = vh;
   canvas.style.left = "0px";
-  canvas.style.top = "0px";
+  canvas.style.top = canvas_top;
   canvas.style.overflow = "visible";
   canvas.style.position = "absolute";
   canvas.style.zIndex = "10000";
@@ -63,12 +55,13 @@ function destroyCanvas() {
 function draw(x, y) {
   const canvas = $("#canvas");
   if (canvas) {
+    const canvas_top = canvas.style.top.replace("px", "");
     const ctx = canvas.getContext("2d");
     ctx.beginPath();
     ctx.strokeStyle = "#" + myColor;
     ctx.lineWidth = myWidth;
-    ctx.moveTo(lx, ly);
-    ctx.lineTo(x, y);
+    ctx.moveTo(lx, ly - canvas_top);
+    ctx.lineTo(x, y - canvas_top);
     ctx.stroke();
     lx = x;
     ly = y;
