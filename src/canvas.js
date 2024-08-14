@@ -27,12 +27,15 @@ function createCanvas() {
     canvas.id = "canvas";
     document.body.appendChild(canvas);
   }
-  canvas.style.width = document.body.scrollWidth;
-  canvas.style.height = document.body.scrollHeight;
-  canvas.width = window.document.body.scrollWidth;
-  canvas.height = window.document.body.scrollHeight;
+
+  let vw = window.visualViewport.width - window.screenX;
+  let vh = window.visualViewport.height - window.screenY;
+
+  const canvas_top = window.visualViewport.pageTop + "px";
+  canvas.style.width = canvas.width = vw;
+  canvas.style.height = canvas.height = vh;
   canvas.style.left = "0px";
-  canvas.style.top = "0px";
+  canvas.style.top = canvas_top;
   canvas.style.overflow = "visible";
   canvas.style.position = "absolute";
   canvas.style.zIndex = "10000";
@@ -52,12 +55,13 @@ function destroyCanvas() {
 function draw(x, y) {
   const canvas = $("#canvas");
   if (canvas) {
+    const canvas_top = canvas.style.top.replace("px", "");
     const ctx = canvas.getContext("2d");
     ctx.beginPath();
     ctx.strokeStyle = "#" + myColor;
     ctx.lineWidth = myWidth;
-    ctx.moveTo(lx, ly);
-    ctx.lineTo(x, y);
+    ctx.moveTo(lx, ly - canvas_top);
+    ctx.lineTo(x, y - canvas_top);
     ctx.stroke();
     lx = x;
     ly = y;
