@@ -14,4 +14,3 @@ Chrome extension for simple mouse gestures. Code is based on miniGestures withou
 See v0.1 in action at [YouTube](https://youtu.be/OOZXeHznJSU)
 
 If you like this extension, by me a beer/coffee/candy [Square CashApp](https://tiny.one/6t3hpm6a)
-
