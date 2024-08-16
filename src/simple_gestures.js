@@ -39,6 +39,8 @@ var extensionEnabled = true;
 const elementFromPoint = document.elementFromPoint.bind(document);
 var currentElement = null;
 
+const canvas = new Canvas();
+
 function onStart(event) {
   if (!loaded) {
     watchGestures();
@@ -72,9 +74,9 @@ function onMove(event) {
 
     if (trail) {
       if (moved == false) {
-        createCanvas();
+        canvas.create();
       }
-      draw(ny, nx);
+      canvas.draw(ny, nx);
     }
     moved = true;
     mx = nx;
@@ -129,7 +131,7 @@ document.onmouseup = function (event) {
   }
   rmousedown = false;
   //always remove canvas on mouse up
-  destroyCanvas();
+  canvas.destroy();
 };
 
 document.oncontextmenu = function () {

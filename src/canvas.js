@@ -20,52 +20,60 @@
 // ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH
 // THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-function createCanvas() {
-  let canvas = $("#canvas");
-  if (!canvas) {
-    canvas = document.createElement("canvas");
-    canvas.id = "canvas";
-    document.body.appendChild(canvas);
+class Canvas {
+  #id = "canvas";
+
+  get instance() {
+    return $(this.#id);
   }
 
-  let vw = window.visualViewport.width - window.screenX;
-  let vh = window.visualViewport.height - window.screenY;
+  create() {
+    let canvas = this.instance;
+    if (!canvas) {
+      canvas = document.createElement("canvas");
+      canvas.id = "canvas";
+      document.body.appendChild(canvas);
+    }
 
-  const canvas_top = window.visualViewport.pageTop + "px";
-  canvas.style.width = canvas.width = vw;
-  canvas.style.height = canvas.height = vh;
-  canvas.style.left = "0px";
-  canvas.style.top = canvas_top;
-  canvas.style.overflow = "visible";
-  canvas.style.position = "absolute";
-  canvas.style.zIndex = "10000";
-}
+    let vw = window.visualViewport.width - window.screenX;
+    let vh = window.visualViewport.height - window.screenY;
 
-function destroyCanvas() {
-  const canvas = $("#canvas");
-  if (canvas) {
-    try {
-      document.body.removeChild(canvas);
-    } catch (error) {}
-  } else {
-    console.warn("Canvas not found");
+    const canvas_top = window.visualViewport.pageTop + "px";
+    canvas.style.width = canvas.width = vw;
+    canvas.style.height = canvas.height = vh;
+    canvas.style.left = "0px";
+    canvas.style.top = canvas_top;
+    canvas.style.overflow = "visible";
+    canvas.style.position = "absolute";
+    canvas.style.zIndex = "10000";
   }
-}
 
-function draw(x, y) {
-  const canvas = $("#canvas");
-  if (canvas) {
-    const canvas_top = canvas.style.top.replace("px", "");
-    const ctx = canvas.getContext("2d");
-    ctx.beginPath();
-    ctx.strokeStyle = "#" + myColor;
-    ctx.lineWidth = myWidth;
-    ctx.moveTo(lx, ly - canvas_top);
-    ctx.lineTo(x, y - canvas_top);
-    ctx.stroke();
-    lx = x;
-    ly = y;
-  } else {
-    console.warn("Canvas not found");
+  draw(x, y) {
+    const canvas = this.instance;
+    if (canvas) {
+      const canvas_top = canvas.style.top.replace("px", "");
+      const ctx = canvas.getContext("2d");
+      ctx.beginPath();
+      ctx.strokeStyle = "#" + myColor;
+      ctx.lineWidth = myWidth;
+      ctx.moveTo(lx, ly - canvas_top);
+      ctx.lineTo(x, y - canvas_top);
+      ctx.stroke();
+      lx = x;
+      ly = y;
+    } else {
+      console.warn("Canvas not found");
+    }
+  }
+
+  destroy() {
+    const canvas = this.instance;
+    if (canvas) {
+      try {
+        document.body.removeChild(canvas);
+      } catch (error) {}
+    } else {
+      console.warn("Canvas not found");
+    }
   }
 }
