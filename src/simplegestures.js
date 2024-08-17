@@ -2,6 +2,8 @@ const PI = 3.141592653589793;
 
 const Actions = {
   NewTab: "newtab",
+  NextTab: "nexttab",
+  PrevTab: "prevtab",
 };
 
 class Coords {
@@ -44,17 +46,17 @@ class SimpleGesture {
   #coords;
   #link;
   #canvas;
+  #elementFromPoint;
 
-  constructor(doc) {
+  constructor() {
     this.#config = new Config();
     this.#coords = new Coords();
     this.#canvas = new Canvas();
-    doc.addEventListener("DOMContentLoaded", this.watch);
   }
 
   #onStart(event) {
     if (!this.#loaded) {
-      this.watch();
+      this.#watch();
       this.#loaded = true;
     }
     this.#coords.current.y = event.pageX;
@@ -135,7 +137,7 @@ class SimpleGesture {
     return null;
   }
 
-  watch() {
+  #watch() {
     browser.runtime.sendMessage({ msg: "config" }).then(
       (response) => {
         if (response) {
@@ -153,7 +155,87 @@ class SimpleGesture {
       }
     });
   }
+
+  #contextMenu() {
+    if (!this.#config.enabled) {
+      return true;
+    }
+
+    if (this.#suppress) {
+      return false;
+    }
+
+    this.#rmouseDown = false;
+    this.#suppress++;
+    return true;
+  }
+
+  #mouseUp(event) {
+    if (!this.#config.enabled) {
+      return;
+    }
+    if (this.#rmouseDown && event.buttons > 0) {
+      if (event.button == 2) {
+        browser.runtime.sendMessage({ msg: Actions.NextTab });
+      } else if (event.button == 0) {
+        browser.runtime.sendMessage({ msg: Actions.PrevTab });
+        ++this.#suppress;
+      }
+    } else if (event.button == 2) {
+      if (this.#moved) {
+        this.#execute();
+      } else {
+        --this.#suppress;
+      }
+    }
+    this.#rmouseDown = false;
+    //always remove canvas on mouse up
+    this.#canvas.destroy();
+  }
+
+  #mouseDown(event) {
+    if (!this.#config.enabled) {
+      return;
+    }
+    this.#rmouseDown = event.button == 2;
+    if (this.#rmouseDown && this.#suppress) {
+      this.#onStart(event);
+    }
+  }
+
+  #mouseMove(event) {
+    if (!this.#config.enabled) {
+      return;
+    }
+    //track the mouse if we are holding the right button
+    if (this.#currentElement) {
+      this.#currentElement.removeEventListener(
+        "mousedown",
+        this.#mouseDown.bind(this),
+      );
+    }
+    this.#currentElement = this.#elementFromPoint(event.clientX, event.clientY);
+    if (this.#currentElement) {
+      this.#currentElement.addEventListener(
+        "mousedown",
+        this.#mouseDown.bind(this),
+      );
+    }
+    if (this.#rmouseDown) {
+      this.#onMove(event);
+    }
+  }
+
+  install(doc) {
+    this.#elementFromPoint = doc.elementFromPoint.bind(doc);
+    const capture = { capture: true };
+    doc.addEventListener("contextmenu", this.#contextMenu.bind(this), capture);
+    doc.addEventListener("mousemove", this.#mouseMove.bind(this), capture);
+    doc.addEventListener("mouseup", this.#mouseUp.bind(this), capture);
+    doc.addEventListener("mousedown", this.#mouseDown.bind(this), capture);
+    doc.addEventListener("DOMContentLoaded", this.#watch.bind(this), capture);
+  }
 }
 
-const simpleGesture = new SimpleGesture(document);
-simpleGesture.watch();
+const simpleGesture = new SimpleGesture();
+simpleGesture.install(document);
