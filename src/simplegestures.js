@@ -35,41 +35,37 @@ class Config {
 }
 
 class SimpleGesture {
+  config;
+  moved = false;
   #loaded = false;
-  #rmouseDown = false;
-  #moved = false;
   #currentGesture = "";
   #previousGesture = "";
-  #currentElement = null;
-  #suppress = 1;
-  #config;
   #coords;
   #link;
   #canvas;
-  #elementFromPoint;
 
   constructor() {
-    this.#config = new Config();
+    this.config = new Config();
     this.#coords = new Coords();
     this.#canvas = new Canvas();
   }
 
-  #onStart(event) {
+  start(event) {
     if (!this.#loaded) {
       this.#watch();
       this.#loaded = true;
     }
     this.#coords.current.y = event.pageX;
     this.#coords.current.x = event.pageY;
-    this.#coords.last.x = my;
-    this.#coords.last.y = mx;
+    this.#coords.last.x = event.pageX;
+    this.#coords.last.y = event.pageY;
     this.#currentGesture = "";
     this.#previousGesture = "";
-    this.#moved = false;
+    this.moved = false;
     this.#link = this.#determineLink(event.target, 10);
   }
 
-  #onMove(event) {
+  move(event) {
     const ny = event.pageX;
     const nx = event.pageY;
     const mx = this.#coords.current.x;
@@ -97,20 +93,24 @@ class SimpleGesture {
         this.#previousGesture = tmove;
       }
 
-      if (this.#config.trail.enabled) {
-        if (this.#moved == false) {
+      if (this.config.trail.enabled) {
+        if (this.moved == false) {
           this.#canvas.create();
         }
         this.#canvas.draw(ny, nx);
       }
-      this.#moved = true;
+      this.moved = true;
       this.#coords.current.x = nx;
       this.#coords.current.y = ny;
     }
   }
 
-  #execute() {
-    let action = this.#config.actionMap[this.#currentGesture];
+  stop() {
+    this.#canvas.destroy();
+  }
+
+  execute() {
+    let action = this.config.actionMap[this.#currentGesture];
     if (action) {
       if (isUrl(action)) {
         this.#link = action;
@@ -141,7 +141,7 @@ class SimpleGesture {
     browser.runtime.sendMessage({ msg: "config" }).then(
       (response) => {
         if (response) {
-          this.#config.update(response.resp);
+          this.config.update(response.resp);
         }
       },
       (error) => console.error(error),
@@ -150,92 +150,16 @@ class SimpleGesture {
     browser.runtime.onMessage.addListener((request) => {
       switch (request.msg) {
         case "tabs.config.update":
-          this.#config.update(request.updatedConfig);
+          this.config.update(request.updatedConfig);
           break;
       }
     });
   }
 
-  #contextMenu() {
-    if (!this.#config.enabled) {
-      return true;
-    }
-
-    if (this.#suppress) {
-      return false;
-    }
-
-    this.#rmouseDown = false;
-    this.#suppress++;
-    return true;
-  }
-
-  #mouseUp(event) {
-    if (!this.#config.enabled) {
-      return;
-    }
-    if (this.#rmouseDown && event.buttons > 0) {
-      if (event.button == 2) {
-        browser.runtime.sendMessage({ msg: Actions.NextTab });
-      } else if (event.button == 0) {
-        browser.runtime.sendMessage({ msg: Actions.PrevTab });
-        ++this.#suppress;
-      }
-    } else if (event.button == 2) {
-      if (this.#moved) {
-        this.#execute();
-      } else {
-        --this.#suppress;
-      }
-    }
-    this.#rmouseDown = false;
-    //always remove canvas on mouse up
-    this.#canvas.destroy();
-  }
-
-  #mouseDown(event) {
-    if (!this.#config.enabled) {
-      return;
-    }
-    this.#rmouseDown = event.button == 2;
-    if (this.#rmouseDown && this.#suppress) {
-      this.#onStart(event);
-    }
-  }
-
-  #mouseMove(event) {
-    if (!this.#config.enabled) {
-      return;
-    }
-    //track the mouse if we are holding the right button
-    if (this.#currentElement) {
-      this.#currentElement.removeEventListener(
-        "mousedown",
-        this.#mouseDown.bind(this),
-      );
-    }
-    this.#currentElement = this.#elementFromPoint(event.clientX, event.clientY);
-    if (this.#currentElement) {
-      this.#currentElement.addEventListener(
-        "mousedown",
-        this.#mouseDown.bind(this),
-      );
-    }
-    if (this.#rmouseDown) {
-      this.#onMove(event);
-    }
-  }
-
   install(doc) {
-    this.#elementFromPoint = doc.elementFromPoint.bind(doc);
-    const capture = { capture: true };
-    doc.addEventListener("contextmenu", this.#contextMenu.bind(this), capture);
-    doc.addEventListener("mousemove", this.#mouseMove.bind(this), capture);
-    doc.addEventListener("mouseup", this.#mouseUp.bind(this), capture);
-    doc.addEventListener("mousedown", this.#mouseDown.bind(this), capture);
-    doc.addEventListener("DOMContentLoaded", this.#watch.bind(this), capture);
+    doc.addEventListener("DOMContentLoaded", this.#watch.bind(this));
   }
 }
 
-const simpleGesture = new SimpleGesture();
-simpleGesture.install(document);
+const mouseHandler = new MouseHandler(new SimpleGesture());
+mouseHandler.install(document);
