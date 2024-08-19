@@ -18,7 +18,7 @@ class Config {
   trail = {
     enabled: true,
     color: "red",
-    width: 3,
+    width: 2,
   };
   rockerEnabled = true;
   gestures = {};
@@ -47,7 +47,7 @@ class SimpleGesture {
   constructor() {
     this.config = new Config();
     this.#coords = new Coords();
-    this.#canvas = new Canvas();
+    this.#canvas = new Canvas(this.config, this.#coords);
   }
 
   start(event) {
@@ -72,7 +72,7 @@ class SimpleGesture {
     const my = this.#coords.current.y;
     const r = Math.sqrt(Math.pow(nx - mx, 2) + Math.pow(ny - my, 2));
     if (r > 16) {
-      const phi = Math.atan2(ny - my, nx - mx);
+      let phi = Math.atan2(ny - my, nx - mx);
       if (phi < 0) {
         phi += 2 * PI;
       }

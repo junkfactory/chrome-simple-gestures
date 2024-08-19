@@ -22,16 +22,23 @@
 
 class Canvas {
   #id = "canvas";
+  #config;
+  #coords;
+
+  constructor(config, coords) {
+    this.#config = config;
+    this.#coords = coords;
+  }
 
   get instance() {
-    return $(this.#id);
+    return $("#" + this.#id);
   }
 
   create() {
     let canvas = this.instance;
     if (!canvas) {
       canvas = document.createElement("canvas");
-      canvas.id = "canvas";
+      canvas.id = this.#id;
       document.body.appendChild(canvas);
     }
 
@@ -39,8 +46,10 @@ class Canvas {
     let vh = window.visualViewport.height - window.screenY;
 
     const canvas_top = window.visualViewport.pageTop + "px";
-    canvas.style.width = canvas.width = vw;
-    canvas.style.height = canvas.height = vh;
+    canvas.style.width = vw;
+    canvas.width = vw;
+    canvas.style.height = vh;
+    canvas.height = vh;
     canvas.style.left = "0px";
     canvas.style.top = canvas_top;
     canvas.style.overflow = "visible";
@@ -54,13 +63,13 @@ class Canvas {
       const canvas_top = canvas.style.top.replace("px", "");
       const ctx = canvas.getContext("2d");
       ctx.beginPath();
-      ctx.strokeStyle = "#" + myColor;
-      ctx.lineWidth = myWidth;
-      ctx.moveTo(lx, ly - canvas_top);
+      ctx.strokeStyle = "#" + this.#config.trail.color;
+      ctx.lineWidth = this.#config.trail.width;
+      ctx.moveTo(this.#coords.last.x, this.#coords.last.y - canvas_top);
       ctx.lineTo(x, y - canvas_top);
       ctx.stroke();
-      lx = x;
-      ly = y;
+      this.#coords.last.x = x;
+      this.#coords.last.y = y;
     } else {
       console.warn("Canvas not found");
     }
