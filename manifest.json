@@ -21,7 +21,8 @@
         "src/browser.js",
         "src/lib.js",
         "src/canvas.js",
-        "src/simple_gestures.js"
+        "src/mousehandler.js",
+        "src/simplegestures.js"
       ],
       "all_frames": true,
       "run_at": "document_start"
