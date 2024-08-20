@@ -47,7 +47,7 @@ class SimpleGesture {
   constructor() {
     this.config = new Config();
     this.#coords = new Coords();
-    this.#canvas = new Canvas(this.config, this.#coords);
+    this.#canvas = new Canvas(this.config);
   }
 
   start(event) {
@@ -97,7 +97,12 @@ class SimpleGesture {
         if (this.moved == false) {
           this.#canvas.create();
         }
-        this.#canvas.draw(ny, nx);
+        this.#coords.last = this.#canvas.draw({
+          lx: this.#coords.last.x,
+          ly: this.#coords.last.y,
+          x: ny,
+          y: nx,
+        });
       }
       this.moved = true;
       this.#coords.current.x = nx;

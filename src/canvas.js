@@ -23,11 +23,9 @@
 class Canvas {
   #id = "canvas";
   #config;
-  #coords;
 
-  constructor(config, coords) {
+  constructor(config) {
     this.#config = config;
-    this.#coords = coords;
   }
 
   get instance() {
@@ -57,7 +55,7 @@ class Canvas {
     canvas.style.zIndex = "10000";
   }
 
-  draw(x, y) {
+  draw({ lx, ly, x, y }) {
     const canvas = this.instance;
     if (canvas) {
       const canvas_top = canvas.style.top.replace("px", "");
@@ -65,14 +63,13 @@ class Canvas {
       ctx.beginPath();
       ctx.strokeStyle = "#" + this.#config.trail.color;
       ctx.lineWidth = this.#config.trail.width;
-      ctx.moveTo(this.#coords.last.x, this.#coords.last.y - canvas_top);
+      ctx.moveTo(lx, ly - canvas_top);
       ctx.lineTo(x, y - canvas_top);
       ctx.stroke();
-      this.#coords.last.x = x;
-      this.#coords.last.y = y;
     } else {
-      console.warn("Canvas not found");
+      console.warn("Canvas not found to draw");
     }
+    return { x, y };
   }
 
   destroy() {
@@ -82,7 +79,7 @@ class Canvas {
         document.body.removeChild(canvas);
       } catch (error) {}
     } else {
-      console.warn("Canvas not found");
+      console.info("Canvas not found to destroy");
     }
   }
 }
