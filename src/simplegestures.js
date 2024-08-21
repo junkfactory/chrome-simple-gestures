@@ -98,10 +98,8 @@ class SimpleGesture {
           this.#canvas.create();
         }
         this.#coords.last = this.#canvas.draw({
-          lx: this.#coords.last.x,
-          ly: this.#coords.last.y,
-          x: ny,
-          y: nx,
+          move: this.#coords.last,
+          line: { x: ny, y: nx },
         });
       }
       this.moved = true;

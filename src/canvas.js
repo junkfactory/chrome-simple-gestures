@@ -55,7 +55,7 @@ class Canvas {
     canvas.style.zIndex = "10000";
   }
 
-  draw({ lx, ly, x, y }) {
+  draw({ move, line }) {
     const canvas = this.instance;
     if (canvas) {
       const canvas_top = canvas.style.top.replace("px", "");
@@ -63,13 +63,13 @@ class Canvas {
       ctx.beginPath();
       ctx.strokeStyle = "#" + this.#config.trail.color;
       ctx.lineWidth = this.#config.trail.width;
-      ctx.moveTo(lx, ly - canvas_top);
-      ctx.lineTo(x, y - canvas_top);
+      ctx.moveTo(move.x, move.y - canvas_top);
+      ctx.lineTo(line.x, line.y - canvas_top);
       ctx.stroke();
     } else {
       console.warn("Canvas not found to draw");
     }
-    return { x, y };
+    return line;
   }
 
   destroy() {
