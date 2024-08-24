@@ -1,5 +1,7 @@
 # Simple Gestures
 
+This repo is now archived in favor of [Simple Gestures](https://github.com/junkfactory/simple-gestures)
+
 Chrome extension for simple mouse gestures. Code is based on miniGestures without any shady stuff.
 
 ## Features
